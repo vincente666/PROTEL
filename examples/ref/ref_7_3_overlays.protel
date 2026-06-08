@@ -1,0 +1,15 @@
+% Reference Manual §7.3 — Structure overlays (OVLY)
+
+SECTION ref_overlays;
+
+TYPE integer {-32768 TO 32767};
+
+TYPE word_view STRUCT
+   low integer,
+   high integer
+ENDSTRUCT;
+
+DCL OVLY word_view
+   {0}: low integer,
+   {1}: high integer
+ENDOVLY;

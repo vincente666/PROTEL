@@ -1,0 +1,12 @@
+% ERROR EXAMPLE — RETURN type incompatible with RETURNS clause (§9.2 / §11.3)
+% Expected: protel: type error: RETURN type ... is not compatible with RETURNS BOOL
+
+SECTION err_return_mismatch;
+
+TYPE integer {-32768 TO 32767};
+
+DCL demo PROC() RETURNS BOOL IS
+   BLOCK
+      DCL n integer INIT 0;
+      RETURN n;
+   ENDBLOCK;

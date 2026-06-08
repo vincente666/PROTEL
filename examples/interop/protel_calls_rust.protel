@@ -1,0 +1,18 @@
+% PROTEL calling Rust (Introductory Manual 7.3)
+% Rust exports rust_greet with #[no_mangle] extern "C"; PROTEL imports EXTERNAL.
+
+SECTION protel_calls_rust;
+
+TYPE char {0 TO 255};
+TYPE integer {-32768 TO 32767};
+
+DCL rust_greet PROC(name PTR TO char, value integer) EXTERNAL;
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+
+DCL Start PROC() IS ENTRY;
+
+DCL Start PROC() IS
+   BLOCK
+      rust_greet({'PROTEL', 0}, 42);
+      writeln({'PROTEL called Rust', 0});
+   ENDBLOCK;

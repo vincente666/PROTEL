@@ -1,0 +1,13 @@
+% PROTEL library exported for Python (EXPORT = extern "C" linkage)
+% Python loads the shared object with ctypes.CDLL and binds protel_add.
+
+INTERFACE protel_math;
+
+TYPE integer {-32768 TO 32767};
+
+DCL protel_add PROC(a integer, b integer) RETURNS integer EXPORT;
+
+DCL protel_add PROC(a integer, b integer) RETURNS integer IS
+   BLOCK
+      RETURN a + b;
+   ENDBLOCK;

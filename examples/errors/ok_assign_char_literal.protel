@@ -1,0 +1,11 @@
+% OK EXAMPLE — char literal within range (contrast with err_* examples)
+
+SECTION ok_char_literal;
+
+TYPE char {0 TO 255};
+
+DCL demo PROC() IS
+   BLOCK
+      DCL ch char;
+      65 -> ch;
+   ENDBLOCK;

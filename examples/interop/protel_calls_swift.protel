@@ -1,0 +1,18 @@
+% PROTEL calling Swift (Introductory Manual 7.1 / C interop)
+% Swift exports swift_greet with @_cdecl; PROTEL imports it as EXTERNAL.
+
+SECTION protel_calls_swift;
+
+TYPE char {0 TO 255};
+TYPE integer {-32768 TO 32767};
+
+DCL swift_greet PROC(name PTR TO char, value integer) EXTERNAL;
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+
+DCL Start PROC() IS ENTRY;
+
+DCL Start PROC() IS
+   BLOCK
+      swift_greet({'PROTEL', 0}, 42);
+      writeln({'PROTEL finished calling Swift', 0});
+   ENDBLOCK;

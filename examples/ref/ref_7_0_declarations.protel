@@ -1,0 +1,8 @@
+% Reference Manual §7.0 — Declarations overview
+
+SECTION ref_declarations;
+
+TYPE integer {-32768 TO 32767};
+
+DCL counter integer INIT 0;
+DCL increment PROC() IS BLOCK counter + 1 -> counter; ENDBLOCK;

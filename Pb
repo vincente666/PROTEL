@@ -1,0 +1,340 @@
+#!/usr/bin/env python3
+"""
+Pb - PROTEL Beautifier
+
+A lexical beautifier for PROTEL (Procedure Oriented Type Enforcing Language)
+originally created in the 1990s, then recreated in 2026, by Vincente D'Ingianni, vincente@binary-systems.com.
+
+Reads PROTEL source from a file or standard input (supports redirection, pipes,
+and explicit filename arguments for both input and output).
+
+A first-line UNIX shebang (``#!...``) is preserved unchanged for runnable
+``.protel`` programs (see Introductory Manual section 7.0.5).
+
+Performs lexical analysis:
+- Recognizes comments starting with % (to end of line). Keywords inside comments are ignored.
+- Recognizes strings delimited by single quotes ('' for embedded quote). Keywords inside strings are ignored.
+- All other text is tokenized.
+- Any token that matches a reserved keyword (from the official list in the
+  PROTEL Reference Manual Appendix A) is forced to UPPERCASE.
+- Lines that start with $LI (linker directives) are uppercased in full.
+- Optionally, keywords can be wrapped in ANSI bold escapes (--bold).
+
+Non-keyword identifiers, numbers, operators, and all formatting/whitespace are
+preserved exactly.
+
+The program attempts to determine whether the input "is PROTEL" by counting
+recognized reserved keywords. If very few are found it emits a warning on stderr
+but still outputs the (minimally modified) text.
+
+Keyword list is derived directly from the Reference Manual (Appendix A) and
+Introductory Manual + the original oflpr/oflpi sources.
+
+Usage examples:
+    cat myprog.protel | Pb
+    Pb --bold < myprog.protel > pretty.protel
+    ./Pb --bold < example.txt
+    Pb myprog.protel > pretty.protel
+    Pb myprog.protel pretty.protel
+    Pb < myprog.protel | less
+
+Shebang makes it directly executable after chmod +x Pb
+"""
+
+import sys
+import re
+import argparse
+
+# Official PROTEL Reserved Keywords (Reference Manual Appendix A / oflpr / oflpi)
+PROTEL_KEYWORDS = {
+    "$EJECT",
+    "$LI",
+    "$OBJECT",
+    "$REFDESC",
+    "$TYPEDESC",
+    "$UNIVERSAL_PTR",
+    "$VARDESC",    
+    "AREA",
+    "AS",
+    "BIND",
+    "BLOCK",
+    "BOOL",
+    "BY",
+    "CASE",
+    "CAST",
+    "CLASS",
+    "DCL",
+    "DEFINITIONS",
+    "DESC",
+    "DO",
+    "DOWN",
+    "ELSE",
+    "ENDAREA",
+    "ENDBLOCK",
+    "ENDCASE",
+    "ENDCLASS",
+    "ENDDO",
+    "ENDIF",
+    "ENDOVLY",
+    "ENDSELECT",
+    "ENDSTRUCT",
+    "ENTRY",
+    "EXIT",
+    "EXTERNAL",
+    "EXPORT",
+    "FALSE",
+    "FAST",
+    "FOR",
+    "FORWARD",
+    "FROM",
+    "IF",
+    "IN",
+    "INCL",
+    "INIT",
+    "INTERFACE",
+    "INTRINSIC",
+    "IS",
+    "LITERAL",
+    "METHOD",
+    "MOD",
+    "NIL",
+    "NONTRANSPARENT",
+    "NOTINCL",
+    "OF",
+    "OPERAND",
+    "OPERATIONS",
+    "OUT",
+    "OVER",
+    "OVLY",
+    "PACK",
+    "PERPROCESS",
+    "PRIVATE",
+    "PROC",
+    "PROTECTED",
+    "PTR",
+    "QUICK",
+    "REF",
+    "REFDESC",
+    "REFINES",
+    "RETURN",
+    "RETURNS",
+    "SECTION",
+    "SELECT",
+    "SELF",
+    "SET",
+    "SHARED",
+    "STRUCT",
+    "TABLE",
+    "TDSIZE",
+    "THEN",
+    "TO",
+    "TRUE",
+    "TYPE",
+    "TYPEDESC",
+    "UNRESTRICTED",
+    "UP",
+    "UPB",
+    "UPDATES",
+    "USES",
+    "VAL",
+    "VARDESC",
+    "VARIABLE",
+    "WHILE",
+    "WITH",
+}
+
+KEYWORD_RE = re.compile(
+    r'\b(' + '|'.join(sorted(PROTEL_KEYWORDS, key=len, reverse=True)) + r')\b',
+    re.IGNORECASE
+)
+
+ANSI_BOLD = '\033[1m'
+ANSI_RESET = '\033[0m'
+
+def is_likely_protel(keyword_count: int, total_ident_count: int) -> bool:
+    if keyword_count >= 2:
+        return True
+    if total_ident_count > 0 and (keyword_count / max(1, total_ident_count)) >= 0.1:
+        return True
+    return False
+
+def is_dollar_li_line(line: str) -> bool:
+    """True when line begins with a $LI linker directive (after optional indent)."""
+    stripped = line.lstrip()
+    return len(stripped) >= 3 and stripped[:3].upper() == "$LI"
+
+
+def uppercase_dollar_li_line(line: str) -> str:
+    """Uppercase an entire $LI linker directive line, preserving the line ending."""
+    ending = ""
+    body = line
+    if line.endswith("\r\n"):
+        ending = "\r\n"
+        body = line[:-2]
+    elif line.endswith("\n"):
+        ending = "\n"
+        body = line[:-1]
+    elif line.endswith("\r"):
+        ending = "\r"
+        body = line[:-1]
+    return body.upper() + ending
+
+
+def find_comment_start(code_part: str) -> int:
+    """
+    Find the position of the first % that starts a comment in 'code_part',
+    respecting strings (but we assume code_part has no outer strings here).
+    Very simple: first unquoted % .
+    """
+    in_string = False
+    i = 0
+    while i < len(code_part):
+        c = code_part[i]
+        if c == "'":
+            in_string = not in_string
+            # handle '' escape
+            if in_string and i + 1 < len(code_part) and code_part[i+1] == "'":
+                i += 1
+        elif c == '%' and not in_string:
+            return i
+        i += 1
+    return -1
+
+def beautify_protel(source: str, use_bold: bool = False) -> str:
+    output_parts = []
+    keyword_count = 0
+    ident_count = 0
+
+    # Process line by line so we can cleanly separate "code before %" from comments
+    lines = source.splitlines(keepends=True)
+    shebang_line = ""
+    if lines and lines[0].startswith("#!"):
+        shebang_line = lines[0]
+        lines = lines[1:]
+
+    for line in lines:
+        if is_dollar_li_line(line):
+            output_parts.append(uppercase_dollar_li_line(line))
+            keyword_count += 1
+            continue
+
+        # Find the first % that is not inside a string on this line
+        # We scan for strings and % manually per line (simple and reliable)
+        code_part = line
+        comment_part = ''
+
+        comment_pos = find_comment_start(line)
+        if comment_pos != -1:
+            code_part = line[:comment_pos]
+            comment_part = line[comment_pos:]
+
+        # Tokenize the code_part with the existing spec (no COMMENT now)
+        line_code_out = []
+        for match in TOKEN_RE.finditer(code_part):
+            kind = match.lastgroup
+            token = match.group()
+
+            if kind == 'STRING':
+                line_code_out.append(token)
+            elif kind == 'KEYWORD_ID':
+                ident_count += 1
+                upper = token.upper()
+                if upper in PROTEL_KEYWORDS:
+                    keyword_count += 1
+                    if use_bold:
+                        line_code_out.append(f"{ANSI_BOLD}{upper}{ANSI_RESET}")
+                    else:
+                        line_code_out.append(upper)
+                else:
+                    line_code_out.append(token)
+            else:
+                line_code_out.append(token)
+
+        output_parts.append(''.join(line_code_out) + comment_part)
+
+    result = ''.join(output_parts)
+    if shebang_line:
+        result = shebang_line + result
+
+    if not is_likely_protel(keyword_count, ident_count):
+        sys.stderr.write(
+            f"Pb: Warning - only {keyword_count} PROTEL keywords detected "
+            f"(out of ~{ident_count} identifiers). "
+            "Input may not be PROTEL source.\n"
+        )
+
+    return result
+
+# Token spec (used only on the "code" portion after comment stripping)
+TOKEN_SPEC = [
+    ('STRING',    r"'(?:''|[^'])*'"),
+    ('KEYWORD_ID',r'[A-Za-z_$][A-Za-z0-9_$]*'),
+    ('NUMBER',    r'\d+(?:\.\d+)?(?:[eE][+-]?\d+)?'),
+    ('OP_SYM',    r'->|::=|[<>=!&|/*%+-]+|[\(\)\[\]\{\},;:\.\^]'),
+    ('WHITESPACE',r'[ \t\r\n]+'),
+    ('OTHER',     r'.'),
+]
+
+TOKEN_RE = re.compile(
+    '|'.join(f'(?P<{name}>{pattern})' for name, pattern in TOKEN_SPEC),
+    re.IGNORECASE | re.DOTALL
+)
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Pb - PROTEL Beautifier. Uppercases reserved keywords in "
+                    "PROTEL source. Supports stdin/stdout, redirection, and "
+                    "file arguments for input/output. Optionally adds bold.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
+    )
+    parser.add_argument('-b', '--bold', action='store_true',
+                        help='Wrap keywords in ANSI bold (\\033[1m ... \\033[0m)')
+    parser.add_argument('--version', action='version',
+                        version='Pb 1.0 (PROTEL Beautifier)')
+
+    parser.add_argument('input', nargs='?', default='-',
+                        help='Input PROTEL file (default: read from stdin). '
+                             'Use "-" to explicitly read from stdin.')
+    parser.add_argument('output', nargs='?', default='-',
+                        help='Output file (default: write to stdout). '
+                             'Use "-" to explicitly write to stdout.')
+
+    args = parser.parse_args()
+
+    # Read source
+    if args.input == '-':
+        try:
+            source = sys.stdin.read()
+        except (KeyboardInterrupt, BrokenPipeError):
+            sys.exit(0)
+    else:
+        try:
+            with open(args.input, 'r', encoding='utf-8', errors='replace') as f:
+                source = f.read()
+        except OSError as e:
+            sys.stderr.write(f"Pb: Error reading input file '{args.input}': {e}\n")
+            sys.exit(1)
+
+    if not source:
+        return
+
+    beautified = beautify_protel(source, use_bold=args.bold)
+
+    # Write output
+    if args.output == '-':
+        try:
+            sys.stdout.write(beautified)
+            sys.stdout.flush()
+        except BrokenPipeError:
+            sys.exit(0)
+    else:
+        try:
+            with open(args.output, 'w', encoding='utf-8') as f:
+                f.write(beautified)
+        except OSError as e:
+            sys.stderr.write(f"Pb: Error writing output file '{args.output}': {e}\n")
+            sys.exit(1)
+
+if __name__ == "__main__":
+    main()

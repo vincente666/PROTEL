@@ -1,0 +1,18 @@
+% PROTEL calling Java (Introductory Manual 7.3)
+% C shim java_greet embeds the JVM and calls GreetHelper.greet.
+
+SECTION protel_calls_java;
+
+TYPE char {0 TO 255};
+TYPE integer {-32768 TO 32767};
+
+DCL java_greet PROC(name PTR TO char, value integer) EXTERNAL;
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+
+DCL Start PROC() IS ENTRY;
+
+DCL Start PROC() IS
+   BLOCK
+      java_greet({'PROTEL', 0}, 42);
+      writeln({'PROTEL called Java', 0});
+   ENDBLOCK;

@@ -1,0 +1,321 @@
+#!/usr/bin/env python3
+"""PROTEL 2026 compiler driver (Introductory Manual 7.1)."""
+
+from __future__ import annotations
+
+import argparse
+import os
+import sys
+from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parent
+_SCRIPT = Path(__file__).resolve()
+_VENV_PY = _ROOT / ".venv" / "bin" / "python3"
+_REQUIREMENTS = _ROOT / "requirements.txt"
+
+
+def _running_in_project_venv() -> bool:
+    """True only when this interpreter's sys.prefix is the project .venv."""
+    try:
+        return Path(sys.prefix).resolve() == (_ROOT / ".venv").resolve()
+    except OSError:
+        return False
+
+
+def _bootstrap_venv() -> None:
+    import subprocess
+
+    if not _VENV_PY.exists():
+        subprocess.run(
+            [sys.executable, "-m", "venv", str(_ROOT / ".venv")],
+            check=True,
+        )
+    subprocess.run(
+        [
+            str(_ROOT / ".venv" / "bin" / "pip"),
+            "install",
+            "-q",
+            "-r",
+            str(_REQUIREMENTS),
+        ],
+        check=True,
+    )
+
+
+def _ensure_runtime() -> None:
+    """Use project .venv with Lark installed; bootstrap on first run."""
+    if _running_in_project_venv():
+        try:
+            import lark  # noqa: F401
+        except ImportError:
+            try:
+                _bootstrap_venv()
+            except Exception as exc:
+                print(
+                    f"protel: failed to install dependencies in .venv: {exc}",
+                    file=sys.stderr,
+                )
+                raise SystemExit(1) from exc
+            try:
+                import lark  # noqa: F401
+            except ImportError as exc:
+                print(
+                    "protel: lark is still missing after setup; "
+                    "run 'make install'",
+                    file=sys.stderr,
+                )
+                raise SystemExit(1) from exc
+        return
+
+    try:
+        _bootstrap_venv()
+    except Exception as exc:
+        print(f"protel: failed to set up Python environment: {exc}", file=sys.stderr)
+        print(
+            "protel: run 'make install' or "
+            "'python3 -m venv .venv && .venv/bin/pip install -r requirements.txt'",
+            file=sys.stderr,
+        )
+        raise SystemExit(1) from exc
+
+    os.execv(str(_VENV_PY), [str(_VENV_PY), str(_SCRIPT), *sys.argv[1:]])
+
+
+_ensure_runtime()
+
+sys.path.insert(0, str(_ROOT))
+
+from src.parser import parse_protel
+from src.transpiler import transpile_to_c
+from src.cpp_transpiler import transpile_to_cpp
+from src.type_checker import TypeCheckError
+from src.compile import compile_cpp, run_executable
+from src.extensions import format_suffix_list, is_pls_suffix, is_protel_source
+
+
+def _validate_input(path: Path) -> None:
+    if not is_protel_source(path):
+        print(
+            f"protel: warning: '{path}' does not use a PROTEL extension "
+            f"({format_suffix_list()})",
+            file=sys.stderr,
+        )
+
+
+def _split_program_args(argv: list[str]) -> tuple[list[str], list[str]]:
+    if "--" not in argv:
+        return argv, []
+    sep = argv.index("--")
+    return argv[:sep], argv[sep + 1 :]
+
+
+def _promote_shebang_input(
+    argv: list[str], program_args: list[str]
+) -> tuple[list[str], list[str]]:
+    """
+    Shebang form: protel --run -- script.protel [program args].
+
+    The kernel places the script path after ``--``; promote it to the input
+    positional expected by the driver.
+    """
+    if "--run" not in argv or not program_args:
+        return argv, program_args
+    candidate = Path(program_args[0])
+    try:
+        if is_protel_source(candidate) and candidate.is_file():
+            return [*argv, program_args[0]], program_args[1:]
+    except OSError:
+        pass
+    return argv, program_args
+
+
+def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    argv, program_args = _split_program_args(list(argv))
+    argv, program_args = _promote_shebang_input(argv, program_args)
+
+    parser = argparse.ArgumentParser(
+        description="PROTEL 2026 compiler (GCC/clang++ backend)",
+        epilog=(
+            "Invoke: protel [-o outfile] sourcefile(s) [--classical]\n"
+            "GCC options -g and -c are passed through when compiling."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "input",
+        nargs="+",
+        help="PROTEL source file(s) (.protel, .pt, .ptl, .P, .AA01..ZZ99)",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Output file (executable, object, or generated source)",
+    )
+    parser.add_argument(
+        "--classical",
+        action="store_true",
+        help="Legacy PROTEL identifier rules (keywords remain UPPERCASE)",
+    )
+    parser.add_argument(
+        "--parse-only",
+        action="store_true",
+        help="Parse only; print AST summary to stderr",
+    )
+    parser.add_argument(
+        "--emit-c",
+        action="store_true",
+        help="Emit C instead of C++ (default is C++)",
+    )
+    parser.add_argument(
+        "--compile",
+        action="store_true",
+        help="Transpile and compile to a native executable or object",
+    )
+    parser.add_argument(
+        "--run",
+        action="store_true",
+        help="Compile and run the program (implies --compile)",
+    )
+    parser.add_argument(
+        "-c",
+        action="store_true",
+        help="Compile only; produce an object file (passed to GCC)",
+    )
+    parser.add_argument(
+        "-g",
+        action="store_true",
+        help="Generate debug info (passed to GCC)",
+    )
+    parser.add_argument(
+        "--keep",
+        action="store_true",
+        help="Keep generated C/C++ source after compiling",
+    )
+    parser.add_argument("--version", action="version", version="protel 0.3.0")
+
+    args = parser.parse_args(argv)
+
+    if len(args.input) > 1:
+        print("protel: warning: only the first source file is compiled", file=sys.stderr)
+
+    input_path = Path(args.input[0]).resolve()
+    _validate_input(input_path)
+    classical = args.classical or is_pls_suffix(input_path.suffix)
+
+    try:
+        source = input_path.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        print(f"protel: cannot read '{input_path}': {exc}", file=sys.stderr)
+        return 1
+
+    try:
+        tree = parse_protel(source, classical=classical)
+    except Exception as exc:
+        print(f"protel: parse error in '{input_path}': {exc}", file=sys.stderr)
+        return 1
+
+    if args.parse_only:
+        print(tree, file=sys.stderr)
+        return 0
+
+    compile_requested = args.compile or args.run or args.c or (
+        args.output is not None and not args.output.endswith((".c", ".cpp"))
+    )
+
+    try:
+        if args.emit_c:
+            code = transpile_to_c(
+                tree,
+                classical=classical,
+                source_name=str(input_path),
+                source_path=input_path,
+            )
+            default_ext = ".c"
+        else:
+            code = transpile_to_cpp(
+                tree,
+                classical=classical,
+                source_name=str(input_path),
+                source_path=input_path,
+            )
+            default_ext = ".cpp"
+    except TypeCheckError as exc:
+        print(f"protel: type error in '{input_path}': {exc}", file=sys.stderr)
+        return 1
+    except Exception as exc:
+        print(f"protel: transpile error in '{input_path}': {exc}", file=sys.stderr)
+        return 1
+
+    if compile_requested:
+        if args.emit_c:
+            print("protel: compile mode requires C++ output (omit --emit-c)", file=sys.stderr)
+            return 1
+
+        build_dir = _ROOT / "build"
+        build_dir.mkdir(parents=True, exist_ok=True)
+        if args.output and str(args.output).endswith((".c", ".cpp")):
+            gen_path = Path(args.output)
+        else:
+            gen_path = build_dir / f"{input_path.stem}{default_ext}"
+        gen_path.write_text(code, encoding="utf-8")
+
+        if args.c:
+            obj_path = Path(args.output) if args.output else input_path.with_suffix(".o")
+            try:
+                compile_cpp(
+                    gen_path,
+                    obj_path,
+                    compile_only=True,
+                    debug=args.g,
+                )
+            except RuntimeError as exc:
+                print(f"protel: compile error: {exc}", file=sys.stderr)
+                return 1
+            if not args.keep:
+                try:
+                    gen_path.unlink()
+                except OSError:
+                    pass
+            print(f"protel: wrote {obj_path}", file=sys.stderr)
+            return 0
+
+        exe_path = Path(args.output) if args.output else Path("a.out")
+        try:
+            compile_cpp(gen_path, exe_path, debug=args.g)
+        except RuntimeError as exc:
+            print(f"protel: compile error: {exc}", file=sys.stderr)
+            return 1
+
+        if not args.keep:
+            try:
+                gen_path.unlink()
+            except OSError:
+                pass
+
+        if args.run:
+            code_rc, stdout, stderr = run_executable(exe_path, program_args)
+            if stdout:
+                sys.stdout.write(stdout)
+            if stderr:
+                sys.stderr.write(stderr)
+            return code_rc
+
+        print(f"protel: wrote {exe_path}", file=sys.stderr)
+        return 0
+
+    if args.output:
+        try:
+            Path(args.output).write_text(code, encoding="utf-8")
+        except OSError as exc:
+            print(f"protel: cannot write '{args.output}': {exc}", file=sys.stderr)
+            return 1
+    else:
+        sys.stdout.write(code)
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

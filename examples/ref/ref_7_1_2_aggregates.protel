@@ -1,0 +1,23 @@
+% Reference Manual §7.1.2 — Aggregate types (SET, STRUCT, TABLE, DESC, AREA)
+% Area options include UNRESTRICTED and NONTRANSPARENT.
+
+SECTION ref_aggregates;
+
+TYPE integer {-32768 TO 32767};
+TYPE hue SET integer;
+TYPE pair STRUCT
+   left integer,
+   right integer
+ENDSTRUCT;
+TYPE buffer TABLE[0 TO 7] OF integer;
+TYPE view DESC OF integer;
+
+TYPE father UNRESTRICTED AREA (48)
+   a integer,
+   b integer
+ENDAREA;
+
+DCL colors hue;
+DCL buf buffer;
+DCL hues hue IS {1, 2, 4};
+DCL merged hue IS hues INCL {8};

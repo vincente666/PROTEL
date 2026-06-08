@@ -1,0 +1,11 @@
+% Reference Manual §3.0–§3.4 — Language format, keywords, comments, symbols
+
+SECTION ref_lexical;
+
+TYPE integer {-32768 TO 32767};
+
+DCL demo PROC() IS
+   BLOCK
+      DCL total integer INIT 0;
+      1 + 2 * 3 -> total;
+   ENDBLOCK;

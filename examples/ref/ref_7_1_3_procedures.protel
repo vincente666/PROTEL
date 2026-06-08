@@ -1,0 +1,17 @@
+% Reference Manual §7.1.3 — Procedure types (QUICK, OPERAND, FORWARD, UPDATES, REF)
+
+SECTION ref_procedures;
+
+TYPE integer {-32768 TO 32767};
+
+DCL add_pair QUICK PROC(a integer, b integer) RETURNS integer IS FORWARD;
+
+DCL add_pair QUICK PROC(a integer, b integer) RETURNS integer IS
+   BLOCK
+      RETURN a + b;
+   ENDBLOCK;
+
+DCL scale OPERAND PROC(REF factor integer, UPDATES buf TABLE[0 TO 3] OF integer) IS
+   BLOCK
+      factor * buf[0] -> buf[0];
+   ENDBLOCK;

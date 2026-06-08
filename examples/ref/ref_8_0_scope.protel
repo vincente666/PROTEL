@@ -1,0 +1,14 @@
+% Reference Manual §8.0–§8.2 — Scope rules and local blocks
+
+SECTION ref_scope;
+
+TYPE integer {-32768 TO 32767};
+
+DCL outer PROC() IS
+   BLOCK
+      DCL outer_var integer INIT 1;
+      BLOCK
+         DCL inner_var integer INIT 2;
+         inner_var + outer_var -> inner_var;
+      ENDBLOCK
+   ENDBLOCK;

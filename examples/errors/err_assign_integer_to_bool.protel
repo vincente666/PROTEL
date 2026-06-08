@@ -1,0 +1,13 @@
+% ERROR EXAMPLE — integer assigned to BOOL (§11.3)
+% Expected: protel: type error: cannot assign ... to BOOL
+
+SECTION err_int_to_bool;
+
+TYPE integer {-32768 TO 32767};
+
+DCL demo PROC() IS
+   BLOCK
+      DCL flag BOOL;
+      DCL n integer INIT 1;
+      n -> flag;
+   ENDBLOCK;

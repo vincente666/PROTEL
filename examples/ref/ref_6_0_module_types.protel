@@ -1,0 +1,19 @@
+% Reference Manual §6.0 — Module types (FAST, PERPROCESS, DEFINITIONS, INTERFACE)
+
+FAST SECTION ref_fast;
+
+TYPE fast_integer {-32768 TO 32767};
+
+PERPROCESS SECTION ref_perprocess;
+
+TYPE pp_integer {-32768 TO 32767};
+
+DEFINITIONS SECTION ref_definitions;
+
+TYPE def_integer {-32768 TO 32767};
+
+INTERFACE ref_interface;
+
+TYPE iface_integer {-1 TO 1};
+
+DCL iface_proc PROC() IS BLOCK ENDBLOCK;

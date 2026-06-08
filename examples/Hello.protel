@@ -1,0 +1,18 @@
+#!/usr/bin/env protel-run
+% Hello World - PROTEL 2026 (Introductory Manual 5.5.2 / 7.0)
+% Run from repo root: export PATH="$PWD:$PATH" && ./examples/Hello.protel
+% EXTERNAL C I/O via minimal runtime; no INTRINSIC, no iostream.
+% PROTEL strings are char tuples; append 0 explicitly for C calls.
+
+SECTION Hello;
+
+TYPE char {0 TO 255};
+
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+
+DCL Start PROC() IS ENTRY;
+
+DCL Start PROC() IS
+   BLOCK
+      writeln({'Hello, World!', 0});
+   ENDBLOCK;

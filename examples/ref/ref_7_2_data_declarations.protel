@@ -1,0 +1,11 @@
+% Reference Manual §7.2 — Data declarations (INIT, PACK, VAL, LITERAL, VARIABLE)
+
+SECTION ref_data_decl;
+
+TYPE integer {-32768 TO 32767};
+TYPE packed_digit PACK (4) {0 TO 15};
+TYPE val_char VAL {0 TO 255};
+
+DCL literal_max LITERAL integer INIT 100;
+DCL counter VARIABLE integer INIT 0;
+DCL packed_val packed_digit IS 7;

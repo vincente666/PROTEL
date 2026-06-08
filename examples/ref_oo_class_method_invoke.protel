@@ -1,0 +1,22 @@
+% Class Methods and Variables (1994) - Example 4 (invocation)
+
+SECTION oo_invoke_demo;
+
+TYPE integer {-32768 TO 32767};
+
+TYPE class_with_class_method
+CLASS REFINES $OBJECT
+  {}:
+    instance_var integer
+OPERATIONS
+  {CLASS}:
+    class_method(parameter integer)
+ENDCLASS class_with_class_method;
+
+DCL instance class_with_class_method;
+
+DCL demo PROC() IS
+BLOCK
+   class_with_class_method.class_method(5);
+   instance.class_method(6);
+ENDBLOCK;

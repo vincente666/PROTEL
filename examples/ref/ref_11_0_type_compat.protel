@@ -1,0 +1,11 @@
+% Reference Manual §11.0–§11.3 — Type compatibility and operators
+
+SECTION ref_type_compat;
+
+TYPE integer {-32768 TO 32767};
+TYPE small {0 TO 7};
+
+DCL combine PROC(a integer, b small) RETURNS integer IS
+   BLOCK
+      RETURN a + b;
+   ENDBLOCK;

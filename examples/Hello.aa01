@@ -1,0 +1,16 @@
+% Hello World - PLS edition suffix .aa01 (Introductory Manual 7.0 / 7.2)
+% Legacy PLS naming: two letters + two digits (.AA01 through .ZZ99).
+% Same program as Hello.protel; edition AA01 is illustrative only.
+
+SECTION Hello;
+
+TYPE char {0 TO 255};
+
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+
+DCL Start PROC() IS ENTRY;
+
+DCL Start PROC() IS
+   BLOCK
+      writeln({'Hello, World!', 0});
+   ENDBLOCK;

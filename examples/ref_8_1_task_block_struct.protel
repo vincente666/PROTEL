@@ -1,0 +1,14 @@
+% Reference Manual 2026 - STRUCT type example (task_block)
+
+SECTION struct_demo;
+
+TYPE integer {-32768 TO 32767};
+TYPE code_block integer;
+
+TYPE task_block STRUCT
+   priority {0 TO 5},
+   status {ready, blocked, executing},
+   next_task PTR TO task_block,
+   completed BOOL,
+   code code_block
+ENDSTRUCT;

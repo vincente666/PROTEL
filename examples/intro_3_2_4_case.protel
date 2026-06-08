@@ -1,0 +1,16 @@
+% Introductory Manual 2026 - Section 3.2.4 (CASE statement)
+
+SECTION case_demo;
+
+TYPE digit {0 TO 9};
+TYPE integer {-32768 TO 32767};
+
+DCL route_digit PROC(n digit) IS
+BLOCK
+   CASE n IN
+      {0}: TRUE -> operator;
+      {1}: TRUE -> ddd_call;
+      {4}: TRUE -> assist;
+      OUT
+   ENDCASE;
+ENDBLOCK;

@@ -1,0 +1,18 @@
+% PROTEL calling Python (Introductory Manual 7.3)
+% C shim python_greet embeds Python and calls greet_helper.greet.
+
+SECTION protel_calls_python;
+
+TYPE char {0 TO 255};
+TYPE integer {-32768 TO 32767};
+
+DCL python_greet PROC(name PTR TO char, value integer) EXTERNAL;
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+
+DCL Start PROC() IS ENTRY;
+
+DCL Start PROC() IS
+   BLOCK
+      python_greet({'PROTEL', 0}, 42);
+      writeln({'PROTEL called Python', 0});
+   ENDBLOCK;

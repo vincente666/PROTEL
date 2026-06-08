@@ -1,0 +1,21 @@
+% Introductory Manual §5.5.2 — UNIX argc/argv and shell exit status
+% The ENTRY procedure receives the host command line; RETURN becomes exit status.
+
+SECTION ArgsExit;
+
+TYPE char {0 TO 255};
+TYPE integer {-32768 TO 32767};
+
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+
+DCL Start PROC(argc integer, argv PTR TO PTR TO char) IS ENTRY;
+
+DCL Start PROC(argc integer, argv PTR TO PTR TO char) RETURNS integer IS
+   BLOCK
+      DCL i integer INIT 0;
+      FOR i FROM 0 UP TO argc - 1
+      DO
+         writeln(argv[i]);
+      ENDDO;
+      RETURN argc;
+   ENDBLOCK;

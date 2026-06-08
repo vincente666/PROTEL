@@ -1,0 +1,22 @@
+% Reference Manual §9.1 — Expressions (operators, NIL, FALSE, MOD, CAST, descriptors)
+% Runtime descriptor types: $TYPEDESC $VARDESC $REFDESC $UNIVERSAL_PTR
+
+SECTION ref_expressions;
+
+TYPE integer {-32768 TO 32767};
+TYPE universal PTR TO integer;
+
+DCL demo PROC() RETURNS integer IS
+   BLOCK
+      DCL a integer INIT 10;
+      DCL b integer INIT 3;
+      DCL flag BOOL INIT FALSE;
+      DCL cell_ptr PTR TO integer INIT NIL;
+      DCL slot universal INIT NIL;
+      DCL td integer INIT 0;
+      TYPEDESC integer -> td;
+      VARDESC a -> td;
+      REFDESC cell_ptr -> td;
+      CAST a AS integer -> a;
+      RETURN a MOD b;
+   ENDBLOCK;

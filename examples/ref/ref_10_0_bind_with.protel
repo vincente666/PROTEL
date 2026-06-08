@@ -1,0 +1,18 @@
+% Reference Manual §10.0 — BIND and WITH declarations
+
+SECTION ref_bind_with;
+
+TYPE integer {-32768 TO 32767};
+
+TYPE point STRUCT
+   x integer,
+   y integer
+ENDSTRUCT;
+
+DCL demo PROC() IS
+   BLOCK
+      DCL p point;
+      BIND px TO p AS point;
+      WITH p;
+      1 -> px.x;
+   ENDBLOCK;

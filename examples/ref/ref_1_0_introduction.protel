@@ -1,0 +1,9 @@
+% Reference Manual §1.0 — Introduction (minimal compilation unit)
+
+SECTION ref_intro;
+
+TYPE integer {-32768 TO 32767};
+
+DCL noop PROC() IS
+   BLOCK
+   ENDBLOCK;

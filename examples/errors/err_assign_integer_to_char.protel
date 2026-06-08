@@ -1,0 +1,14 @@
+% ERROR EXAMPLE — integer assigned to char (Reference Manual §11.3)
+% Expected: protel: type error: cannot assign integer to char
+
+SECTION err_int_to_char;
+
+TYPE char {0 TO 255};
+TYPE integer {-32768 TO 32767};
+
+DCL demo PROC() IS
+   BLOCK
+      DCL ch char;
+      DCL n integer INIT 65;
+      n -> ch;
+   ENDBLOCK;

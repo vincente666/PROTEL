@@ -1,0 +1,11 @@
+% Reference Manual §9.0 — Executable statements overview
+
+SECTION ref_statements;
+
+TYPE integer {-32768 TO 32767};
+
+DCL run PROC() IS
+   BLOCK
+      DCL x integer INIT 0;
+      x + 1 -> x;
+   ENDBLOCK;

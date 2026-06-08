@@ -1,0 +1,11 @@
+% Reference Manual §4.0–§4.5 — Identifiers, numbers, constants, tuples, strings
+
+SECTION ref_data;
+
+TYPE integer {-32768 TO 32767};
+TYPE char {0 TO 255};
+
+DCL nums TABLE[1 TO 3] OF integer IS {1, 2, 3};
+DCL label TABLE[1 TO 5] OF char IS {'h', 'e', 'l', 'l', 'o'};
+DCL flag BOOL IS TRUE;
+DCL empty_tuple TABLE[1 TO 0] OF integer IS {};

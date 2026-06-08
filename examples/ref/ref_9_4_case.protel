@@ -1,0 +1,15 @@
+% Reference Manual §9.4 — CASE statement
+
+SECTION ref_case;
+
+TYPE digit {0 TO 9};
+TYPE integer {-32768 TO 32767};
+
+DCL route PROC(n digit) IS
+   BLOCK
+      CASE n IN
+         {0}: TRUE -> operator;
+         {1}: TRUE -> local;
+         OUT
+      ENDCASE;
+   ENDBLOCK;

@@ -1,0 +1,10 @@
+% Reference Manual §9.2 — RETURN statement
+
+SECTION ref_return;
+
+TYPE integer {-32768 TO 32767};
+
+DCL status PROC(code integer) RETURNS integer IS
+   BLOCK
+      RETURN code;
+   ENDBLOCK;

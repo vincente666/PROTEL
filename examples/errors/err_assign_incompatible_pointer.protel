@@ -1,0 +1,16 @@
+% ERROR EXAMPLE — incompatible pointer assignment (§11.3 rule 5)
+% Expected: protel: type error: cannot assign PTR TO ... 
+
+SECTION err_ptr_mismatch;
+
+TYPE integer {-32768 TO 32767};
+TYPE char {0 TO 255};
+
+DCL demo PROC() IS
+   BLOCK
+      DCL i integer;
+      DCL ch char;
+      DCL ip PTR TO integer INIT NIL;
+      DCL cp PTR TO char INIT NIL;
+      cp -> ip;
+   ENDBLOCK;

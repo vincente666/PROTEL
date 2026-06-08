@@ -1,0 +1,14 @@
+% ERROR EXAMPLE — integer assigned to PACK byte (§7.2.3 / §11.3)
+% Expected: protel: type error: cannot assign wide integer to packed byte-sized type
+
+SECTION err_int_to_packed;
+
+TYPE integer {-32768 TO 32767};
+TYPE nibble PACK (4) {0 TO 15};
+
+DCL demo PROC() IS
+   BLOCK
+      DCL slot nibble;
+      DCL value integer INIT 9;
+      value -> slot;
+   ENDBLOCK;

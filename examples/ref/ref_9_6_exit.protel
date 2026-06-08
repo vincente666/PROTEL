@@ -1,0 +1,17 @@
+% Reference Manual §9.6 — EXIT statement
+
+SECTION ref_exit;
+
+TYPE integer {-32768 TO 32767};
+
+DCL search PROC(limit integer) RETURNS integer IS
+   BLOCK
+      DCL i integer INIT 0;
+      FOR i FROM 0 UP TO limit
+      DO
+         IF i = 3 THEN
+            EXIT;
+         ENDIF;
+      ENDDO;
+      RETURN i;
+   ENDBLOCK;

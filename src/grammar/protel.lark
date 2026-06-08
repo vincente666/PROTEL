@@ -1,0 +1,408 @@
+// PROTEL 2026 grammar (Reference Manual + Introductory Manual 2026)
+// Keywords are uppercased by the preprocessor before parsing.
+
+%import common.WS
+%ignore WS
+
+?start: compilation_unit
+
+compilation_unit: unit_item+
+
+unit_item: section_head
+         | in_impl_block
+         | declaration
+         | statement
+
+section_head: section_kind IDENT ";" -> section_plain
+            | section_kind IDENT "USES" id_list ";" -> section_uses
+            | section_kind IDENT "OF" id_list ";" -> section_of
+            | section_kind IDENT "OF" id_list "USES" id_list ";" -> section_of_uses
+            | module_type section_kind IDENT ";" -> section_plain
+            | module_type section_kind IDENT "USES" id_list ";" -> section_uses
+            | module_type section_kind IDENT "OF" id_list ";" -> section_of
+            | module_type section_kind IDENT "OF" id_list "USES" id_list ";" -> section_of_uses
+
+module_type: "FAST"
+           | "SWAPPABLE"
+           | "PERPROCESS"
+           | "DEFINITIONS"
+
+section_kind: "INTERFACE" -> interface_kind
+            | "SECTION" -> section_kind_kw
+
+in_impl_block: "IN" IDENT in_impl_item+ -> class_impl_section
+
+in_impl_item: method_impl_dcl
+            | declaration
+            | statement
+
+method_impl_dcl: "DCL" IDENT "METHOD" "IS" block ";"
+
+declaration: type_dcl_stmt
+           | variable_dcl_stmt
+           | proc_dcl_stmt
+
+type_dcl_stmt: "TYPE" type_dcl (";" | type_dcl_list_tail)
+type_dcl_list_tail: "," type_dcl (";" | type_dcl_list_tail)
+
+type_dcl: id_list type_spec
+
+variable_dcl_stmt: "DCL" variable_dcl (";" | variable_dcl_list_tail)
+variable_dcl_list_tail: "," variable_dcl (";" | variable_dcl_list_tail)
+
+variable_dcl: "OVLY" type_spec ovly_body "ENDOVLY" -> variable_dcl_ovly
+            | id_list "LITERAL" type_spec variable_init_tail -> variable_dcl_literal
+            | id_list "VARIABLE" type_spec variable_init_tail -> variable_dcl_variable
+            | id_list type_spec variable_init_tail
+            | id_list type_spec
+
+variable_init_tail: "INIT" expr -> variable_init_init
+                  | "IS" init_value -> variable_init_is
+
+init_value: expr
+         | block
+
+proc_dcl_stmt: "DCL" proc_dcl ";"
+
+proc_dcl: id_list proc_sig "IS" block
+        | id_list proc_sig "IS" "INTRINSIC" -> proc_dcl_intrinsic
+        | id_list proc_sig "IS" "FORWARD" -> proc_dcl_forward
+        | id_list proc_sig "EXTERNAL" -> proc_dcl_external
+        | id_list proc_sig "EXPORT" -> proc_dcl_export
+        | id_list proc_sig "IS" "ENTRY" -> proc_dcl_entry
+        | id_list proc_sig
+
+proc_sig: "QUICK" "PROC" paren_parms "RETURNS" type_spec
+        | "OPERAND" "PROC" paren_parms "RETURNS" type_spec
+        | "PROC" paren_parms "RETURNS" type_spec
+        | "QUICK" "PROC" paren_parms
+        | "OPERAND" "PROC" paren_parms
+        | "PROC" paren_parms
+
+paren_parms: "(" ")"
+            | "(" parm_list ")"
+
+parm_list: parm ("," parm)*
+
+parm: "UPDATES" id_list type_spec -> parm_updates
+    | "REF" id_list type_spec
+    | id_list type_spec
+
+block: "BLOCK" block_innards "ENDBLOCK"
+
+block_innards: declaration* statement*
+
+statement: if_stmt
+         | loop_stmt
+         | for_stmt
+         | over_stmt
+         | case_stmt
+         | select_stmt
+         | exit_stmt
+         | return_stmt
+         | bind_stmt
+         | with_stmt
+         | block
+         | expr_stmt
+
+bind_stmt: "BIND" bind_list ";"
+with_stmt: "WITH" with_ref_list ";"
+
+bind_list: bind_item ("," bind_item)*
+bind_item: IDENT "TO" qualified_ref opt_as_clause
+
+opt_as_clause: | "AS" type_spec
+
+with_ref_list: qualified_ref ("," qualified_ref)*
+
+if_stmt: "IF" expr "THEN" statement_list "ENDIF" ";"
+       | "IF" expr "THEN" statement_list "ELSE" statement_list "ENDIF" ";"
+
+loop_stmt: "WHILE" expr "DO" statement_list "ENDDO" ";"
+         | "DO" statement_list "ENDDO" ";"
+
+for_stmt: "FOR" IDENT for_range "DO" statement_list "ENDDO" ";"
+
+for_range: "OVER" type_spec -> for_over_range
+         | from_to_parts -> for_index_range
+
+from_to_parts: opt_from_clause to_clause opt_by_clause opt_while_clause
+
+opt_from_clause: | "FROM" expr
+to_clause: | "UP" "TO" expr -> up_to_clause
+          | "DOWN" "TO" expr -> down_to_clause
+opt_by_clause: | "BY" expr
+opt_while_clause: | "WHILE" expr
+
+over_stmt: "OVER" type_spec "DO" statement_list "ENDDO" ";"
+
+case_stmt: "CASE" expr "IN" case_body "ENDCASE" ";"
+select_stmt: "SELECT" expr "IN" case_body "ENDSELECT" ";"
+
+case_body: case_list out_case?
+
+case_list: case_item
+         | case_list case_item
+
+case_item: tuple ":" case_arm_nonempty -> case_item_nonempty
+         | tuple ":" -> case_item_empty
+
+case_arm_nonempty: case_arm_stmt+
+
+case_arm_stmt: if_stmt
+             | loop_stmt
+             | for_stmt
+             | over_stmt
+             | case_stmt
+             | select_stmt
+             | exit_stmt
+             | return_stmt
+             | block
+             | expr_stmt
+
+out_case: "OUT" -> out_case_empty
+        | "OUT" out_arm_stmt+ -> out_case_with_stmts
+
+out_arm_stmt: if_stmt
+            | loop_stmt
+            | for_stmt
+            | over_stmt
+            | case_stmt
+            | select_stmt
+            | exit_stmt
+            | return_stmt
+            | block
+            | expr_stmt
+
+exit_stmt: "EXIT" ";"
+
+return_stmt: "RETURN" ";"
+           | "RETURN" expr ";"
+
+expr_stmt: expr ";"
+
+statement_list: statement+
+
+// --- Types ---
+
+type_spec: pack_type
+         | val_type
+         | unpacked_type
+
+pack_type: "PACK" "(" constant_expr ")" unpacked_type
+val_type: "VAL" unpacked_type
+
+unpacked_type: range_type
+             | symbolic_range
+             | bool_type
+             | ptr_type
+             | set_type
+             | struct_type
+             | class_type
+             | table_type
+             | desc_type
+             | area_type
+             | defined_type
+
+area_type: area_option* "AREA" "(" constant_expr ")" area_field_list "ENDAREA"
+
+area_option: "UNRESTRICTED" -> area_unrestricted
+           | "NONTRANSPARENT" -> area_nontransparent
+
+area_field_list: area_field ("," area_field)*
+area_field: id_list type_spec
+
+ovly_body: ovly_field ("," ovly_field)*
+ovly_field: tuple ":" id_list type_spec
+
+range_type: "{" constant_subrange "}"
+
+symbolic_range: "{" id_list "}"
+
+bool_type: "BOOL"
+
+ptr_type: "PTR" "TO" type_spec
+
+set_type: "SET" simple_type
+
+simple_type: range_type
+           | symbolic_range
+           | bool_type
+           | defined_type
+
+struct_type: "STRUCT" struct_field_list "ENDSTRUCT"
+
+struct_field_list: struct_field ("," struct_field)*
+
+struct_field: id_list type_spec
+
+class_type: "CLASS" opt_refines class_data_sections operations_section "ENDCLASS" IDENT
+
+opt_refines: | "REFINES" defined_type
+
+class_data_sections: class_data_section*
+
+class_data_section: segment_flags ":" class_field_list
+
+segment_flags: "{" segment_attr_list "}"
+
+segment_attr_list: | segment_attr ("," segment_attr)*
+
+segment_attr: "PROTECTED" -> seg_protected
+            | "SHARED" -> seg_shared
+            | "PRIVATE" -> seg_private
+            | "EXCLUSIVE" -> seg_exclusive
+            | "READABLE" -> seg_readable
+            | "WRITABLE" -> seg_writable
+
+class_field_list: class_field ("," class_field)*
+
+class_field: id_list type_spec opt_field_semi
+
+opt_field_semi: | ";"
+
+operations_section: "OPERATIONS" method_section_list
+
+method_section_list: method_section*
+
+method_section: method_segment_flags ":" method_group_list
+
+method_segment_flags: "{" method_attr_list "}"
+
+method_attr_list: | method_attr ("," method_attr)*
+
+method_attr: "ABSTRACT" -> meth_abstract
+           | "CLASS" -> meth_class
+           | "CREATE" -> meth_create
+           | "EXCLUSIVE" -> meth_exclusive
+           | "FIXED" -> meth_fixed
+           | "HIDDEN" -> meth_hidden
+           | "OVERRIDING" -> meth_overriding
+
+method_group_list: method_group ("," method_group)*
+
+method_group: method_id_list method_decl_sig
+
+method_id_list: IDENT ("," IDENT)*
+
+method_decl_sig: "METHOD" opt_method_parms opt_method_returns
+               | opt_method_parms opt_method_returns
+
+opt_method_parms: | paren_parms
+opt_method_returns: | "RETURNS" type_spec
+
+table_type: "TABLE" bounds "OF" type_spec
+
+desc_type: "DESC" "OF" type_spec
+         | "DESC" bounds "OF" type_spec
+
+bounds: "[" constant_subrange "]"
+
+defined_type: IDENT
+
+constant_subrange: constant_expr "TO" constant_expr
+
+// --- Expressions ---
+
+?expr: assign_expr
+
+?assign_expr: or_expr assign_tail*
+
+assign_tail: "->" qualified_ref
+
+?or_expr: or_expr "|" and_expr -> bin_or
+        | and_expr
+
+?and_expr: and_expr "&" xor_expr -> bin_and
+         | xor_expr
+
+?xor_expr: xor_expr "^" eq_expr -> bin_xor
+         | eq_expr
+
+?incl_expr: incl_expr "INCL" rel_expr -> bin_incl
+          | incl_expr "NOTINCL" rel_expr -> bin_notincl
+          | rel_expr
+
+?eq_expr: eq_expr "=" incl_expr -> bin_eq
+        | eq_expr "^=" incl_expr -> bin_ne
+        | incl_expr
+
+?rel_expr: rel_expr ">" add_expr -> bin_gt
+         | rel_expr ">=" add_expr -> bin_ge
+         | rel_expr "<" add_expr -> bin_lt
+         | rel_expr "<=" add_expr -> bin_le
+         | add_expr
+
+?add_expr: add_expr "+" mul_expr -> bin_add
+         | add_expr "-" mul_expr -> bin_sub
+         | mul_expr
+
+?mul_expr: mul_expr "*" unary_expr -> bin_mul
+         | mul_expr "/" unary_expr -> bin_div
+         | mul_expr "MOD" unary_expr -> bin_mod
+         | unary_expr
+
+?unary_expr: "!" unary_expr
+           | "-" unary_expr
+           | "UPB" unary_expr -> upb_expr
+           | "TDSIZE" unary_expr -> tdsize_expr
+           | "TYPEDESC" unary_expr -> typedesc_expr
+           | "VARDESC" unary_expr -> vardesc_expr
+           | "REFDESC" unary_expr -> refdesc_expr
+           | "CAST" unary_expr "AS" type_spec -> cast_expr
+           | primary
+
+?primary: literal
+        | qualified_ref
+        | tuple
+        | "(" expr ")"
+
+qualified_ref: ref_segment qual_suffix*
+
+ref_segment: IDENT
+           | "SELF" -> self_ref
+           | "SUPER" -> super_ref
+
+qual_suffix: index_suffix -> qual_index
+           | dot_suffix
+           | call_suffix
+
+dot_suffix: "." IDENT
+
+call_suffix: "(" ")"
+           | "(" actual_list ")"
+
+index_suffix: "[" expr "]"
+            | "[" expr "TO" expr "]"
+
+actual_list: expr ("," expr)*
+
+literal: NUMBER
+       | "TRUE" -> true_lit
+       | "FALSE" -> false_lit
+       | "NIL" -> nil_lit
+       | STRING
+
+tuple: "{" "}"
+     | "{" tuple_body_list "}"
+
+tuple_body_list: tuple_elem ("," tuple_elem)*
+
+tuple_elem: expr
+
+?constant_expr: constant_expr_atom
+
+constant_expr_atom: NUMBER
+                  | "TRUE" -> true_lit
+                  | "FALSE" -> false_lit
+                  | "NIL" -> nil_lit
+                  | STRING
+                  | "{" constant_tuple_body "}"
+
+constant_tuple_body: constant_expr_atom ("," constant_expr_atom)*
+
+id_list: IDENT ("," IDENT)*
+
+IDENT: /[A-Za-z_$][A-Za-z0-9_$]*/
+NUMBER: /-?\d+/
+STRING: /'(?:''|[^'])*'/

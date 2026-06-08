@@ -1,0 +1,12 @@
+% ERROR EXAMPLE — numeric literal out of subrange (§11.3)
+% Expected: protel: type error: value ... out of range for {0 TO 255}
+
+SECTION err_out_of_range;
+
+TYPE char {0 TO 255};
+
+DCL demo PROC() IS
+   BLOCK
+      DCL ch char;
+      300 -> ch;
+   ENDBLOCK;

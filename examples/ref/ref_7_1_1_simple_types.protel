@@ -1,0 +1,14 @@
+% Reference Manual §7.1.1 — Simple types (range, symbolic, BOOL, PTR, defined)
+
+SECTION ref_simple_types;
+
+TYPE integer {-32768 TO 32767};
+TYPE digit {0 TO 9};
+TYPE status {idle, busy, error};
+TYPE flag BOOL;
+TYPE node STRUCT
+   value integer,
+   next PTR TO node
+ENDSTRUCT;
+
+DCL root PTR TO node;

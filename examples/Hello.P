@@ -1,0 +1,16 @@
+% Hello World - legacy .P extension (Introductory Manual 5.5.2 / 7.0 / 7.2)
+% Same program as Hello.protel; .P is the historical Nortel/BNR suffix.
+% EXTERNAL C I/O via minimal runtime; no INTRINSIC, no iostream.
+
+SECTION Hello;
+
+TYPE char {0 TO 255};
+
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+
+DCL Start PROC() IS ENTRY;
+
+DCL Start PROC() IS
+   BLOCK
+      writeln({'Hello, World!', 0});
+   ENDBLOCK;

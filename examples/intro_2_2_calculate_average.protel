@@ -1,0 +1,12 @@
+% Introductory Manual 2026 - Figure 4 (constant procedure declaration)
+
+SECTION calculate_average_demo;
+
+TYPE integer {-32768 TO 32767};
+
+DCL calculate_average PROC(number_1, number_2 integer) RETURNS integer IS
+BLOCK
+   DCL average integer;
+   (number_1 + number_2) / 2 -> average;
+   RETURN average;
+ENDBLOCK;

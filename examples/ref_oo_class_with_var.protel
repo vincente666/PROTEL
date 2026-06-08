@@ -1,0 +1,29 @@
+% Class Methods and Variables (1994) - Examples 1-3 adapted for PROTEL 2026
+
+INTERFACE oo_class_demo;
+
+TYPE integer {-32768 TO 32767};
+
+TYPE class_with_var
+CLASS REFINES $OBJECT
+  {PROTECTED}:
+    class_var integer;
+  {}:
+    instance_var integer
+OPERATIONS
+  {CLASS}:
+    class_method(parameter integer)
+  {}:
+    instance_method(value integer)
+ENDCLASS class_with_var;
+
+IN class_with_var
+DCL class_method METHOD IS
+BLOCK
+   5 -> SELF.class_var;
+ENDBLOCK;
+
+DCL instance_method METHOD IS
+BLOCK
+   value -> SELF.instance_var;
+ENDBLOCK;

@@ -1,0 +1,26 @@
+% Reference Manual §9.7 — Iterative statements (WHILE, FOR, OVER, DOWN, BY)
+
+SECTION ref_iterative;
+
+TYPE integer {-32768 TO 32767};
+TYPE item TABLE[0 TO 3] OF integer;
+
+DCL iterate PROC() RETURNS integer IS
+   BLOCK
+      DCL sum integer INIT 0;
+      DCL i integer INIT 0;
+      DCL j integer INIT 3;
+      WHILE i < 4
+      DO
+         i + 1 -> i;
+      ENDDO;
+      FOR j FROM 3 DOWN TO 0 BY 1
+      DO
+         sum + j -> sum;
+      ENDDO;
+      OVER item
+      DO
+         sum + 1 -> sum;
+      ENDDO;
+      RETURN sum;
+   ENDBLOCK;

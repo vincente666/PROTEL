@@ -1,0 +1,5 @@
+$LI modentry restart
+$EJECT
+SECTION ref_directives;
+TYPE integer {-32768 TO 32767};
+DCL noop PROC() IS BLOCK ENDBLOCK;

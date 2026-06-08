@@ -1,0 +1,43 @@
+% Reference Manual OO extension — CLASS, METHOD, CREATE, OVERRIDING, SUPER
+
+INTERFACE ref_oo;
+
+TYPE integer {-32768 TO 32767};
+
+TYPE base_node
+CLASS REFINES $OBJECT
+  {PROTECTED, SHARED}:
+    depth integer;
+  {PRIVATE, EXCLUSIVE}:
+    tag integer
+OPERATIONS
+  {ABSTRACT}:
+    describe()
+  {CREATE, OVERRIDING, HIDDEN, FIXED}:
+    depth() RETURNS integer
+  {CLASS}:
+    factory() RETURNS PTR TO base_node
+  {}:
+    bump()
+ENDCLASS base_node;
+
+TYPE leaf_node
+CLASS REFINES base_node
+  {PROTECTED}:
+    value integer
+OPERATIONS
+  {OVERRIDING}:
+    describe(),
+    bump()
+ENDCLASS leaf_node;
+
+IN leaf_node
+DCL describe METHOD IS
+   BLOCK
+      SUPER.bump();
+   ENDBLOCK;
+
+DCL bump METHOD IS
+   BLOCK
+      1 + SELF.value -> SELF.value;
+   ENDBLOCK;

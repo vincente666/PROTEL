@@ -1,0 +1,11 @@
+% Reference Manual §12.0 — Intrinsic procedures
+
+SECTION ref_intrinsic;
+
+TYPE integer {-32768 TO 32767};
+
+DCL writeln PROC(msg PTR TO char) IS INTRINSIC;
+
+DCL demo PROC() IS
+   BLOCK
+   ENDBLOCK;

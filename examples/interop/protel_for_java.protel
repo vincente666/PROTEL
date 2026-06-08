@@ -1,0 +1,13 @@
+% PROTEL library exported for Java (EXPORT = extern "C" linkage)
+% Java loads the shared object via JNI (java_calls_protel.c bridge).
+
+INTERFACE protel_math;
+
+TYPE integer {-32768 TO 32767};
+
+DCL protel_add PROC(a integer, b integer) RETURNS integer EXPORT;
+
+DCL protel_add PROC(a integer, b integer) RETURNS integer IS
+   BLOCK
+      RETURN a + b;
+   ENDBLOCK;

@@ -1,0 +1,12 @@
+% Introductory Manual 2026 - Section 2.1 (selected type declarations)
+
+SECTION types_demo;
+
+TYPE integer {-32768 TO 32767};
+TYPE digit_register TABLE[0 TO 15] OF integer;
+TYPE features_table DESC OF integer;
+TYPE availability BOOL;
+TYPE trunk_status {in_service, out_of_service};
+
+DCL primes TABLE[1 TO 6] OF integer IS {2, 3, 5, 7, 11, 13};
+DCL seconds_per_hour integer IS 60 * 60;

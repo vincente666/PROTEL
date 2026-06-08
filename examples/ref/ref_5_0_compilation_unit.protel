@@ -1,0 +1,15 @@
+% Reference Manual §5.0 — Unit of compilation (USES / OF)
+
+SECTION ref_provider;
+
+TYPE integer {-32768 TO 32767};
+
+DCL provider_value integer IS 42;
+
+SECTION ref_consumer OF ref_provider USES ref_provider;
+
+DCL consumer PROC() IS
+   BLOCK
+      DCL local integer INIT 0;
+      provider_value -> local;
+   ENDBLOCK;

@@ -1,0 +1,19 @@
+% Reference Manual §14.0 — Appendix A keyword exercise (remaining reserved words)
+
+SECTION ref_keywords;
+
+TYPE integer {-32768 TO 32767};
+TYPE char {0 TO 255};
+TYPE hue SET integer;
+
+DCL show PROC() RETURNS integer IS
+   BLOCK
+      DCL mask hue IS {1, 2};
+      DCL subset hue IS {2};
+      DCL merged hue;
+      IF subset NOTINCL mask THEN
+         RETURN 0;
+      ENDIF;
+      merged + (subset INCL {4}) -> merged;
+      RETURN TDSIZE mask;
+   ENDBLOCK;

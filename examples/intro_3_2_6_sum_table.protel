@@ -1,0 +1,17 @@
+% Introductory Manual 2026 - Figure 13 (FOR iterative statement)
+
+SECTION sum_table_demo;
+
+TYPE integer {-32768 TO 32767};
+
+DCL t TABLE[0 TO 9] OF integer;
+
+DCL sum_t PROC() RETURNS integer IS
+BLOCK
+   DCL sum integer INIT 0;
+   FOR i FROM 0 UP TO UPB t
+   DO
+      t[i] + sum -> sum;
+   ENDDO;
+   RETURN sum;
+ENDBLOCK;

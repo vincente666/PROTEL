@@ -1,0 +1,14 @@
+% Reference Manual §9.3 — IF statement
+
+SECTION ref_if;
+
+TYPE integer {-32768 TO 32767};
+
+DCL classify PROC(n integer) RETURNS integer IS
+   BLOCK
+      IF n > 0 THEN
+         RETURN 1;
+      ELSE
+         RETURN 0;
+      ENDIF;
+   ENDBLOCK;

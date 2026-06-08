@@ -1,0 +1,22 @@
+% Reference Manual §13.0 — TYPEDESC, VARDESC, REFDESC; EXTERNAL/EXPORT
+
+SECTION ref_descriptors;
+
+TYPE integer {-32768 TO 32767};
+TYPE char {0 TO 255};
+
+DCL writeln PROC(msg PTR TO char) EXTERNAL;
+DCL exported_add PROC(a integer, b integer) RETURNS integer EXPORT;
+
+DCL exported_add PROC(a integer, b integer) RETURNS integer IS
+   BLOCK
+      RETURN a + b;
+   ENDBLOCK;
+
+DCL Start PROC() IS ENTRY;
+
+DCL Start PROC() IS
+   BLOCK
+      DCL td integer INIT 0;
+      TYPEDESC integer -> td;
+   ENDBLOCK;

@@ -1,0 +1,28 @@
+% Introductory Manual §1.3 + §5.5.2 + §7.3
+% Command-line factorial via USES intro_1_3_factorial.protel (section factorial_demo).
+% Demonstrates C interop: printf() and atoi() are EXTERNAL; no INTRINSIC I/O.
+
+SECTION factorial_cli USES factorial_demo;
+
+TYPE integer {-32768 TO 32767};
+TYPE char {0 TO 255};
+
+DCL printf PROC(fmt PTR TO char, n integer, fact integer) EXTERNAL;
+DCL atoi PROC(str PTR TO char) RETURNS integer EXTERNAL;
+
+DCL Start PROC(argc integer, argv PTR TO PTR TO char) IS ENTRY;
+
+DCL Start PROC(argc integer, argv PTR TO PTR TO char) RETURNS integer IS
+   BLOCK
+      DCL n integer INIT 0;
+      DCL result integer INIT 0;
+      IF argc < 2
+      THEN
+         printf({'Usage: factorial N', 0}, 0, 0);
+         RETURN 1;
+      ENDIF;
+      atoi(argv[1]) -> n;
+      factorial(n) -> result;
+      printf({'%d! = %d', 0}, n, result);
+      RETURN 0;
+   ENDBLOCK;
