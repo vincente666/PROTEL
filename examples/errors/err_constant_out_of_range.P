@@ -1,5 +1,5 @@
 % ERROR EXAMPLE — numeric literal out of subrange (§11.3)
-% Expected: protel: type error: value ... out of range for {0 TO 255}
+% Expected: Pc: type error: value ... out of range for {0 TO 255}
 
 SECTION err_out_of_range;
 

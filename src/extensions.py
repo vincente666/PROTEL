@@ -5,13 +5,20 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-# Modern / distribution suffixes (case-insensitive except where noted).
-_FIXED_SUFFIXES = frozenset({".protel", ".pt", ".ptl", ".p"})
+# Default distribution suffix (historical Nortel/BNR). The compiler does not
+# require any particular extension; these are conventions for tooling and Emacs.
+DEFAULT_SUFFIX = ".P"
+
+# Recognized suffixes (case-insensitive except where noted).
+_FIXED_SUFFIXES = frozenset({".p", ".protel", ".pt", ".ptl"})
 
 # PLS edition suffix: .AA01 .. .ZZ99 (two letters + two digits).
 _PLS_SUFFIX_RE = re.compile(r"\.[A-Za-z]{2}\d{2}$")
 
 PLS_SUFFIX_DESCRIPTION = ".AA01 through .ZZ99 (two letters + two digits)"
+
+# USES module lookup order when the section index has no entry.
+_USES_SUFFIXES = (DEFAULT_SUFFIX, ".protel", ".pt", ".ptl")
 
 
 def is_pls_suffix(suffix: str) -> bool:
@@ -32,6 +39,12 @@ def is_protel_source(path: str | Path) -> bool:
 
 
 def format_suffix_list() -> str:
-    """Human-readable suffix list for CLI messages."""
-    fixed = ", ".join(sorted(_FIXED_SUFFIXES))
+    """Human-readable suffix list for CLI messages (.P listed first as default)."""
+    others = sorted(s for s in _FIXED_SUFFIXES if s.lower() != DEFAULT_SUFFIX.lower())
+    fixed = f"{DEFAULT_SUFFIX} (default), " + ", ".join(others)
     return f"{fixed}, {PLS_SUFFIX_DESCRIPTION}"
+
+
+def uses_module_candidates(module_name: str) -> list[Path]:
+    """Candidate filenames for USES module resolution (stem only; caller adds directory)."""
+    return [Path(f"{module_name}{suffix}") for suffix in _USES_SUFFIXES]

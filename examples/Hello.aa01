@@ -1,6 +1,6 @@
 % Hello World - PLS edition suffix .aa01 (Introductory Manual 7.0 / 7.2)
 % Legacy PLS naming: two letters + two digits (.AA01 through .ZZ99).
-% Same program as Hello.protel; edition AA01 is illustrative only.
+% Same program as Hello.P; edition AA01 is illustrative only.
 
 SECTION Hello;
 

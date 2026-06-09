@@ -21,7 +21,7 @@ SECTION Hello;
 DCL Start PROC() IS ENTRY;
 DCL Start PROC() IS BLOCK ENDBLOCK;
 """
-    cpp = transpile_to_cpp(parse_protel(source), source_name="Hello.protel")
+    cpp = transpile_to_cpp(parse_protel(source), source_name="Hello.P")
     assert "/* ENTRY Start */" in cpp
     assert "void Start()" in cpp
     assert "int main()" in cpp
@@ -34,7 +34,7 @@ def test_procedure_named_main_without_entry_has_no_c_main():
 SECTION demo;
 DCL main PROC() IS BLOCK ENDBLOCK;
 """
-    cpp = transpile_to_cpp(parse_protel(source), source_name="demo.protel")
+    cpp = transpile_to_cpp(parse_protel(source), source_name="demo.P")
     assert "void main()" in cpp
     assert "int main()" not in cpp
 

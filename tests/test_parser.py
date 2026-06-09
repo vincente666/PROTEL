@@ -24,7 +24,7 @@ def test_parse_section_uses_and_of():
 
 
 def test_parse_factorial_example():
-    tree = parse_protel(_read("intro_1_3_factorial.protel"))
+    tree = parse_protel(_read("intro_1_3_factorial.P"))
     assert len(tree) == 1
     section = tree[0]
     assert isinstance(section, ast.Section)
@@ -38,7 +38,7 @@ def test_parse_factorial_example():
 
 
 def test_parse_types_example():
-    tree = parse_protel(_read("intro_2_1_types.protel"))
+    tree = parse_protel(_read("intro_2_1_types.P"))
     section = tree[0]
     type_names = {d.names[0] for d in section.declarations if isinstance(d, ast.TypeDecl)}
     assert "integer" in type_names
@@ -47,7 +47,7 @@ def test_parse_types_example():
 
 
 def test_parse_calculate_average():
-    tree = parse_protel(_read("intro_2_2_calculate_average.protel"))
+    tree = parse_protel(_read("intro_2_2_calculate_average.P"))
     proc = next(
         d for d in tree[0].declarations if isinstance(d, ast.ProcDecl)
     )
@@ -69,7 +69,7 @@ def test_classical_keyword_casing():
 
 
 def test_parse_case_statement():
-    tree = parse_protel(_read("intro_3_2_4_case.protel"))
+    tree = parse_protel(_read("intro_3_2_4_case.P"))
     proc = next(d for d in tree[0].declarations if isinstance(d, ast.ProcDecl))
     case_stmt = proc.body.statements[0]
     assert isinstance(case_stmt, ast.CaseStmt)
@@ -78,7 +78,7 @@ def test_parse_case_statement():
 
 
 def test_parse_for_loop_with_upb():
-    tree = parse_protel(_read("intro_3_2_6_sum_table.protel"))
+    tree = parse_protel(_read("intro_3_2_6_sum_table.P"))
     proc = next(d for d in tree[0].declarations if isinstance(d, ast.ProcDecl))
     for_stmt = next(s for s in proc.body.statements if isinstance(s, ast.ForStmt))
     assert for_stmt.var == "i"
@@ -87,7 +87,7 @@ def test_parse_for_loop_with_upb():
 
 
 def test_parse_struct_type():
-    tree = parse_protel(_read("ref_8_1_task_block_struct.protel"))
+    tree = parse_protel(_read("ref_8_1_task_block_struct.P"))
     task_block = next(
         d for d in tree[0].declarations
         if isinstance(d, ast.TypeDecl) and d.names == ["task_block"]
@@ -97,13 +97,13 @@ def test_parse_struct_type():
 
 
 def test_var_init_not_wrapped_in_tree():
-    tree = parse_protel(_read("intro_2_1_types.protel"))
+    tree = parse_protel(_read("intro_2_1_types.P"))
     primes = next(d for d in tree[0].declarations if isinstance(d, ast.VarDecl) and "primes" in d.names)
     assert isinstance(primes.init, ast.TupleLit)
 
 
 def test_parse_class_type_with_operations():
-    tree = parse_protel(_read("ref_oo_class_with_var.protel"))
+    tree = parse_protel(_read("ref_oo_class_with_var.P"))
     section = tree[0]
     assert section.section_kind == "INTERFACE"
     class_decl = next(
@@ -124,7 +124,7 @@ def test_parse_class_type_with_operations():
 
 
 def test_parse_class_method_invocation():
-    tree = parse_protel(_read("ref_oo_class_method_invoke.protel"))
+    tree = parse_protel(_read("ref_oo_class_method_invoke.P"))
     proc = next(d for d in tree[0].declarations if isinstance(d, ast.ProcDecl))
     assert isinstance(proc.body.statements[0], ast.MethodCall)
     assert proc.body.statements[0].name == "class_method"
@@ -132,7 +132,7 @@ def test_parse_class_method_invocation():
 
 
 def test_parse_self_member_assignment():
-    tree = parse_protel(_read("ref_oo_class_with_var.protel"))
+    tree = parse_protel(_read("ref_oo_class_with_var.P"))
     impl = tree[0].class_impls[0]
     stmt = impl.declarations[0].body.statements[0]
     assert isinstance(stmt, ast.AssignExpr)

@@ -14,8 +14,8 @@ INTEROP = ROOT / "examples" / "interop"
 
 
 def test_protel_calls_rust_emits_external_rust_greet():
-    source = (INTEROP / "protel_calls_rust.protel").read_text(encoding="utf-8")
-    cpp = transpile_to_cpp(parse_protel(source), source_name="protel_calls_rust.protel")
+    source = (INTEROP / "protel_calls_rust.P").read_text(encoding="utf-8")
+    cpp = transpile_to_cpp(parse_protel(source), source_name="protel_calls_rust.P")
     assert 'extern "C"' in cpp
     assert "void rust_greet(const char* name, int16_t value)" in cpp
     assert "rust_greet(" in cpp
@@ -23,8 +23,8 @@ def test_protel_calls_rust_emits_external_rust_greet():
 
 
 def test_protel_for_rust_exports_c_linkage():
-    source = (INTEROP / "protel_for_rust.protel").read_text(encoding="utf-8")
-    cpp = transpile_to_cpp(parse_protel(source), source_name="protel_for_rust.protel")
+    source = (INTEROP / "protel_for_rust.P").read_text(encoding="utf-8")
+    cpp = transpile_to_cpp(parse_protel(source), source_name="protel_for_rust.P")
     assert "/* EXPORT protel_add" in cpp
     assert "int16_t protel_add(int16_t a, int16_t b)" in cpp
     assert "return (a + b)" in cpp

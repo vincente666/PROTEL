@@ -33,9 +33,9 @@ def test_string_without_nul_emits_no_trailing_zero():
 
 
 def test_hello_uses_explicit_nul_suffix():
-    source = (EXAMPLES / "Hello.protel").read_text(encoding="utf-8")
+    source = (EXAMPLES / "Hello.P").read_text(encoding="utf-8")
     assert "{'Hello, World!', 0}" in source
-    cpp = transpile_to_cpp(parse_protel(source), source_name="Hello.protel")
+    cpp = transpile_to_cpp(parse_protel(source), source_name="Hello.P")
     assert "(const char[]){" in cpp
     assert "'!'" in cpp
     assert ", 0 }" in cpp

@@ -13,14 +13,14 @@ from src.parser import parse_protel
 ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = ROOT / "examples"
 MODE_EL = ROOT / "emacs" / "protel-mode.el"
-PROTEL = ROOT / "protel"
+PROTEL = ROOT / "Pc"
 
 
 @pytest.mark.parametrize(
     "name,expected",
     [
-        ("Hello.protel", True),
         ("Hello.P", True),
+        ("Hello.protel", True),
         ("Hello.p", True),
         ("Hello.pt", True),
         ("Hello.ptl", True),
@@ -42,11 +42,14 @@ def test_is_protel_source_recognizes_fixed_and_pls_suffixes(name, expected):
 def test_is_pls_suffix_matches_letter_digit_pattern():
     assert is_pls_suffix(".aa01")
     assert is_pls_suffix(".AB99")
+    assert not is_pls_suffix(".P")
     assert not is_pls_suffix(".protel")
 
 
 def test_format_suffix_list_mentions_pls_range():
     text = format_suffix_list()
+    assert ".P" in text
+    assert "default" in text
     assert ".AA01" in text
     assert ".ZZ99" in text
 

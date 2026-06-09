@@ -28,7 +28,7 @@ _KEYWORD_BOUNDARY = re.compile(
 
 def _corpus_files() -> list[Path]:
     patterns = (
-        "examples/**/*.protel",
+        "examples/**/*.P",
         "examples/**/*.aa01",
         "examples/**/*.P",
         "vdi.aa01",

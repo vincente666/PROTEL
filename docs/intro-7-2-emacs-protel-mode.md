@@ -33,7 +33,7 @@ Edit the copy once and set your checkout path (required when the file is not ins
 (setq protel-user-root "/path/to/PROTEL")
 ```
 
-The project `.emacs` also searches, in order: `PROTEL_ROOT` environment variable, the directory containing this init file (if it still lives inside PROTEL), the `protel` executable on your `PATH`, then `~/PROTEL`.
+The project `.emacs` also searches, in order: `PROTEL_ROOT` environment variable, the directory containing this init file (if it still lives inside PROTEL), the `Pc` executable on your `PATH` (including `/usr/local/bin` after `make install-system`), then `~/PROTEL` and `/usr/local/protel`.
 
 **Option B — load from the project directory**
 
@@ -48,10 +48,10 @@ After Emacs loads this block, `protel-mode` is available and **file-name detecti
 
 | Extension | Mode started |
 |-----------|--------------|
+| `.P` | `protel-mode` (default PROTEL 2026 suffix; historical Nortel/BNR) |
 | `.protel` | `protel-mode` |
 | `.pt` | `protel-mode` |
 | `.ptl` | `protel-mode` |
-| `.P` | `protel-mode` (legacy Nortel/BNR suffix; case-sensitive match) |
 | `.AA01` … `.ZZ99` | `protel-mode` (PLS edition suffix: two letters + two digits) |
 
 The PLS pattern matches any extension of the form **`.LLNN`** where `L` is a letter (`A`–`Z` or `a`–`z`) and `N` is a decimal digit. Examples: `vdi.aa01`, `module.AB18`, `Hello.aa01`.
@@ -79,7 +79,7 @@ Then in `.emacs`:
 ## 7.2.2 Verifying automatic detection
 
 1. Restart Emacs (or evaluate the `.emacs` block with `M-x eval-buffer`).
-2. Open a PROTEL source file, for example `examples/Hello.protel`, legacy `examples/Hello.P`, or PLS `examples/Hello.aa01`.
+2. Open a PROTEL source file, for example `examples/Hello.P` or PLS `examples/Hello.aa01`.
 3. Confirm the mode line shows **`PROTEL`** (not `Fundamental`).
 4. Alternatively, run `M-x describe-mode` — it should report `protel-mode`.
 
@@ -191,13 +191,13 @@ Example:
 From the PROTEL project directory:
 
 ```bash
-emacs -nw -l .emacs examples/Hello.protel
+emacs -nw -l .emacs examples/Hello.P
 ```
 
 On Linux with a separate nox build:
 
 ```bash
-emacs-nox -l /path/to/PROTEL/.emacs /path/to/PROTEL/examples/Hello.protel
+emacs-nox -l /path/to/PROTEL/.emacs /path/to/PROTEL/examples/Hello.P
 ```
 
 Ensure **Font Lock** is on (`M-x font-lock-mode` or `(global-font-lock-mode 1)` in `.emacs`, already set in the project file). If keywords are not bold, verify your terminal profile allows bold text (Terminal.app: Settings → Profiles → Text → “Use bold fonts”).
@@ -215,7 +215,7 @@ Ensure **Font Lock** is on (`M-x font-lock-mode` or `(global-font-lock-mode 1)` 
 
 | Tool | Manual section | Purpose |
 |------|----------------|---------|
-| `protel` | §7.1 | Transpile and compile PROTEL sources |
+| `Pc` | §7.1 | Transpile and compile PROTEL sources |
 | `Pb` | §7.0 | Beautify / uppercase keywords |
 | `protel-mode` | §7.2 (this section) | Emacs editing support |
 
@@ -228,9 +228,9 @@ For foreign-language linking from PROTEL, see §7.3.
 | Symptom | Likely cause | Remedy |
 |---------|--------------|--------|
 | `Cannot open load file: protel-mode` | `load-path` does not include `emacs/` | In `~/.emacs`, set `(setq protel-user-root "/path/to/PROTEL")` |
-| `PROTEL mode not loaded` warning at startup | Copied `~/.emacs` without checkout path | Set `protel-user-root` in `~/.emacs`, or add PROTEL `protel` to `PATH` |
+| `PROTEL mode not loaded` warning at startup | Copied `~/.emacs` without checkout path | Set `protel-user-root` in `~/.emacs`, or add PROTEL `Pc` to `PATH` |
 | `Cannot find Pb` on beautify | Pb not on PATH | Set `protel-root` or `protel-beautify-command` after mode loads |
-| Buffer stays in `Fundamental` mode | `protel-mode` not loaded, or wrong extension | Add `(require 'protel-mode)`; use `.protel`, `.P`, `.AA01`-style PLS suffix, or `M-x protel-mode` |
+| Buffer stays in `Fundamental` mode | `protel-mode` not loaded, or wrong extension | Add `(require 'protel-mode)`; use `.P`, `.protel`, `.AA01`-style PLS suffix, or `M-x protel-mode` |
 | No keyword highlighting | Font-lock not enabled | `M-x font-lock-mode` (normally on by default) |
 | `Cannot open load file: cc-mode` | Incomplete Emacs install | Use a full GNU Emacs build, not a minimal editor |
 | No bold in Terminal | Terminal profile disables bold | Enable bold fonts in Terminal.app / iTerm; `protel-keyword-face` uses `:weight bold` |

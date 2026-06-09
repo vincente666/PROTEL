@@ -1,0 +1,156 @@
+.\" PROTEL 2026 manual — Vincente D'Ingianni
+.TH Pb 1 "June 2026" "PROTEL 2026" "User Commands"
+.SH NAME
+Pb \- PROTEL source beautifier (keyword uppercasing)
+.SH SYNOPSIS
+.B Pb
+[\fIoptions\fR]
+[[\fB\-\fR]
+.I input
+]
+[[\fB\-\fR]
+.I output
+]
+.SH DESCRIPTION
+.B Pb
+is the PROTEL 2026 beautifier. It performs lexical analysis on PROTEL
+source and uppercases reserved keywords to match the style of the
+PROTEL Reference Manual and historical Nortel/BNR listings.
+.PP
+.B Pb
+is a filter\-style tool: it reads from standard input and writes to
+standard output by default, and supports shell redirection, pipes, and
+explicit input/output file arguments.
+.PP
+Non\-keyword identifiers, numeric literals, operators, and whitespace
+are preserved exactly. Keywords inside
+.B %
+comments or inside
+.B \(aq...\(aq
+string literals are not altered.
+.PP
+Lines beginning with
+.B $LI
+(linker directives) are uppercased in full.
+.PP
+A first\-line UNIX shebang
+.RI ( #!... )
+is copied unchanged to the output so runnable
+.B .P
+programs keep their
+.B Pc!
+interpreter line (see
+.BR Pc (1)).
+.PP
+If very few recognized keywords are found,
+.B Pb
+emits a warning on standard error but still produces output.
+.SH OPTIONS
+.TP
+.BR \-b ", " \-\-bold
+Wrap uppercased keywords in ANSI bold escape sequences
+.RI ( \(rs033[1m " ... " \(rs033[0m )
+for terminals that support bold text.
+.TP
+.B \-\-version
+Print the
+.B Pb
+version
+.RI ( Pb " 1.0 (PROTEL Beautifier)" )
+and exit.
+.TP
+.BR \-h ", " \-\-help
+Print usage and exit.
+.SH ARGUMENTS
+.TP
+.I input
+Source file to beautify. Defaults to standard input
+.RB ( \- ).
+Use
+.B \-
+explicitly to read from standard input when an output file is given.
+.TP
+.I output
+Destination file. Defaults to standard output
+.RB ( \- ).
+Use
+.B \-
+explicitly to write to standard output when an input file is given.
+.SH BEHAVIOR
+.B Pb
+tokenizes the source and matches tokens against the official PROTEL
+reserved\-word list (Reference Manual Appendix A, derived from historical
+.B oflpr
+/
+.B oflpi
+sources). Matching tokens are forced to UPPERCASE.
+.PP
+Comment lines start with
+.BR % .
+String literals use single quotes; an embedded quote is written as two
+single quotes
+.RI ( \(aq\(aq ).
+.PP
+In GNU Emacs,
+.B Pb
+may be invoked on the current buffer via
+.B C\-c C\-f
+.RI ( M-x protel\-beautify ;
+see Introductory Manual \(S7.2).
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Input or output file error.
+.SH EXAMPLES
+Beautify a file in place (via a second file):
+.PP
+.RS
+.B Pb examples/Hello.P build/Hello.pretty.P
+.RE
+.PP
+Filter from standard input:
+.PP
+.RS
+.B Pb \-\-bold < myprog.P > myprog.pretty.P
+.RE
+.PP
+Pipe through a pager:
+.PP
+.RS
+.B Pb < myprog.P | less
+.RE
+.PP
+Copy input path to output path:
+.PP
+.RS
+.B Pb myprog.P myprog.pretty.P
+.RE
+.PP
+Bold keywords on standard output:
+.PP
+.RS
+.B cat myprog.P | Pb \-\-bold
+.RE
+.SH INSTALLATION
+After
+.BR "make install\-system" ,
+.B Pb
+is available as
+.IR /usr/local/bin/Pb
+(symlink to
+.IR /usr/local/protel/Pb ).
+.SH "SEE ALSO"
+.BR Pc (1),
+.BR protel-mode
+(Emacs),
+Introductory Manual \(S7.0.1,
+\(S7.2.
+.SH AUTHORS
+Vincente D'Ingianni \(em PROTEL 2026 revival project (original
+.B Pb
+from the 1990s, recreated 2026).
+.SH COPYRIGHT
+PROTEL \(co Vincente D'Ingianni / Binary Systems.

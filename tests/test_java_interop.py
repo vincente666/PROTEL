@@ -24,8 +24,8 @@ def _java_runtime_available() -> bool:
 
 
 def test_protel_calls_java_emits_external_java_greet():
-    source = (INTEROP / "protel_calls_java.protel").read_text(encoding="utf-8")
-    cpp = transpile_to_cpp(parse_protel(source), source_name="protel_calls_java.protel")
+    source = (INTEROP / "protel_calls_java.P").read_text(encoding="utf-8")
+    cpp = transpile_to_cpp(parse_protel(source), source_name="protel_calls_java.P")
     assert 'extern "C"' in cpp
     assert "void java_greet(const char* name, int16_t value)" in cpp
     assert "java_greet(" in cpp
@@ -33,8 +33,8 @@ def test_protel_calls_java_emits_external_java_greet():
 
 
 def test_protel_for_java_exports_c_linkage():
-    source = (INTEROP / "protel_for_java.protel").read_text(encoding="utf-8")
-    cpp = transpile_to_cpp(parse_protel(source), source_name="protel_for_java.protel")
+    source = (INTEROP / "protel_for_java.P").read_text(encoding="utf-8")
+    cpp = transpile_to_cpp(parse_protel(source), source_name="protel_for_java.P")
     assert "/* EXPORT protel_add" in cpp
     assert "int16_t protel_add(int16_t a, int16_t b)" in cpp
     assert "return (a + b)" in cpp

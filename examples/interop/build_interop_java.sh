@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 BUILD="$ROOT/build/interop"
-PROTEL="$ROOT/protel"
+PC="$ROOT/Pc"
 RUNTIME="$ROOT/src/runtime/protel_io.c"
 INTEROP="$ROOT/examples/interop"
 
@@ -58,7 +58,7 @@ fi
 javac -d "$BUILD" "$INTEROP/GreetHelper.java" "$INTEROP/JavaCallsProtel.java"
 
 echo "=== PROTEL calls Java ==="
-"$PROTEL" "$INTEROP/protel_calls_java.protel" \
+"$PC" "$INTEROP/protel_calls_java.P" \
     --keep -o "$BUILD/protel_calls_java.cpp"
 "$CXX" -std=c++20 -Wall -I"$ROOT/src/runtime" -c "$BUILD/protel_calls_java.cpp" \
     -o "$BUILD/protel_calls_java.o"
@@ -70,7 +70,7 @@ echo "=== PROTEL calls Java ==="
 PROTEL_ROOT="$ROOT" "$BUILD/protel_calls_java"
 
 echo "=== Java calls PROTEL ==="
-"$PROTEL" "$INTEROP/protel_for_java.protel" \
+"$PC" "$INTEROP/protel_for_java.P" \
     --keep -o "$BUILD/protel_for_java.cpp"
 "$CXX" -std=c++20 -Wall -fPIC -I"$ROOT/src/runtime" -c "$BUILD/protel_for_java.cpp" \
     -o "$BUILD/protel_for_java.o"

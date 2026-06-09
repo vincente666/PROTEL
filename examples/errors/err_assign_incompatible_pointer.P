@@ -1,5 +1,5 @@
 % ERROR EXAMPLE — incompatible pointer assignment (§11.3 rule 5)
-% Expected: protel: type error: cannot assign PTR TO ... 
+% Expected: Pc: type error: cannot assign PTR TO ... 
 
 SECTION err_ptr_mismatch;
 

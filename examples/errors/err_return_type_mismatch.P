@@ -1,5 +1,5 @@
 % ERROR EXAMPLE — RETURN type incompatible with RETURNS clause (§9.2 / §11.3)
-% Expected: protel: type error: RETURN type ... is not compatible with RETURNS BOOL
+% Expected: Pc: type error: RETURN type ... is not compatible with RETURNS BOOL
 
 SECTION err_return_mismatch;
 

@@ -36,7 +36,7 @@ You are an expert PROTEL language engineer and compiler developer assisting Vinc
   - Keywords should be in UPPERCASE (and BOLD where appropriate).
   - Comprehensive error handling and diagnostics.
   - Unit tests for parser rules, transpilation edge cases, and legacy compatibility.
-  - PROTEL example files should use the .protel extension (legacy Nortel sources may use .P or PLS edition suffixes .AA01 through .ZZ99).
+  - PROTEL example files should use the **.P** extension by default (historical Nortel/BNR suffix). The compiler does not require any particular extension — `.protel`, `.pt`, `.ptl`, PLS edition suffixes `.AA01` through `.ZZ99`, or any other name are accepted.
   - Indentation should be structured like Pascal.
   - There should be no spaces between PROC and the first parenthesis - PROC(
   - There should be no spaces between TABLE and the first brace - TABLE[
@@ -59,10 +59,12 @@ You are an expert PROTEL language engineer and compiler developer assisting Vinc
 
 ## Build & Test Commands
 - Build: `make` or `cmake --build build/`
+- Local install: `make install` (checkout tree, `./man/man1/` manual pages)
+- System install: `sudo make install-system` (default `SYSPREFIX=/usr/local/protel`, symlinks in `/usr/local/bin`, man pages in `/usr/local/share/man/man1/`)
 - Test: Run full test suite (parser + transpiler validation)
-- Classical mode: `./protel --classical example.ptl`
-- Modern mode: `./protel example.ptl`
-- Runnable sources: first line `#!/usr/bin/env protel-run`, `chmod +x`, project dir on `PATH` (`$PWD` or `$HOME/PROTEL`, not quoted `~/PROTEL`); preprocessor strips `#!` before parse (§7.0.5)
+- Classical mode: `./Pc --classical example.ptl`
+- Modern mode: `./Pc example.ptl`
+- Runnable sources: first line `#!/usr/bin/env Pc!` (shebang helper **Pc!**, pronounced "P-C-Bang"), `chmod +x`, project dir on `PATH` (`$PWD` or `$HOME/PROTEL`, not quoted `~/PROTEL`); preprocessor strips `#!` before parse (§7.0.5)
 - Generate a test suite of PROTEL code covering all features and examples code in PROTEL Introductory Manual 2026.pdf and PROTEL Reference Manual 2026.pdf.   Label test code so it can be correlated to sections of the Introductory Manual and Reference Manual.
 - Compiler and tool invocation should follow example in "PROTEL 2026 Development Tools" from the Introductory or Reference Manual.
 

@@ -1,5 +1,5 @@
 % ERROR EXAMPLE — integer assigned to BOOL (§11.3)
-% Expected: protel: type error: cannot assign ... to BOOL
+% Expected: Pc: type error: cannot assign ... to BOOL
 
 SECTION err_int_to_bool;
 

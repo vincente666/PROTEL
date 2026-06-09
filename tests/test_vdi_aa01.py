@@ -9,7 +9,7 @@ from src.preprocess import normalize_keywords
 
 ROOT = Path(__file__).resolve().parent.parent
 VDI = ROOT / "vdi.aa01"
-PROTEL = ROOT / "protel"
+PROTEL = ROOT / "Pc"
 
 
 def test_preprocess_strips_dollar_li_directive():

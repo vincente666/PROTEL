@@ -24,7 +24,7 @@
   :group 'protel)
 
 (defcustom protel-root nil
-  "PROTEL 2026 checkout directory (contains Pb and emacs/protel-mode.el).
+  "PROTEL 2026 checkout directory (contains Pc, Pb, and emacs/protel-mode.el).
 Used to find Pb when it is not on PATH.  Usually set from ~/.emacs."
   :type 'directory
   :group 'protel)
@@ -109,7 +109,7 @@ When nil, `protel--locate-pb' searches PATH and PROTEL-ROOT."
    (when protel-root
      (let ((pb (expand-file-name "Pb" protel-root)))
        (when (file-exists-p pb) pb)))
-   (when-let ((protel-bin (protel--executable-find "protel")))
+   (when-let ((protel-bin (protel--executable-find "Pc")))
      (let ((pb (expand-file-name "Pb" (file-name-directory protel-bin))))
        (when (file-exists-p pb) pb)))))
 

@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 BUILD="$ROOT/build/interop"
-PROTEL="$ROOT/protel"
+PC="$ROOT/Pc"
 RUNTIME="$ROOT/src/runtime/protel_io.c"
 
 mkdir -p "$BUILD"
@@ -17,7 +17,7 @@ fi
 CXX="$(command -v clang++ || command -v g++)"
 
 echo "=== PROTEL calls Rust ==="
-"$PROTEL" "$ROOT/examples/interop/protel_calls_rust.protel" \
+"$PC" "$ROOT/examples/interop/protel_calls_rust.P" \
     --keep -o "$BUILD/protel_calls_rust.cpp"
 "$CXX" -std=c++20 -Wall -I"$ROOT/src/runtime" -c "$BUILD/protel_calls_rust.cpp" \
     -o "$BUILD/protel_calls_rust.o"
@@ -28,7 +28,7 @@ rustc --crate-type staticlib "$ROOT/examples/interop/rust_greet.rs" \
 "$BUILD/protel_calls_rust"
 
 echo "=== Rust calls PROTEL ==="
-"$PROTEL" "$ROOT/examples/interop/protel_for_rust.protel" \
+"$PC" "$ROOT/examples/interop/protel_for_rust.P" \
     --keep -o "$BUILD/protel_for_rust.cpp"
 "$CXX" -std=c++20 -Wall -I"$ROOT/src/runtime" -c "$BUILD/protel_for_rust.cpp" \
     -o "$BUILD/protel_for_rust.o"

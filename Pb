@@ -9,7 +9,7 @@ Reads PROTEL source from a file or standard input (supports redirection, pipes,
 and explicit filename arguments for both input and output).
 
 A first-line UNIX shebang (``#!...``) is preserved unchanged for runnable
-``.protel`` programs (see Introductory Manual section 7.0.5).
+``.P`` programs (see Introductory Manual section 7.0.5).
 
 Performs lexical analysis:
 - Recognizes comments starting with % (to end of line). Keywords inside comments are ignored.
@@ -31,12 +31,12 @@ Keyword list is derived directly from the Reference Manual (Appendix A) and
 Introductory Manual + the original oflpr/oflpi sources.
 
 Usage examples:
-    cat myprog.protel | Pb
-    Pb --bold < myprog.protel > pretty.protel
+    cat myprog.P | Pb
+    Pb --bold < myprog.P > pretty.P
     ./Pb --bold < example.txt
-    Pb myprog.protel > pretty.protel
-    Pb myprog.protel pretty.protel
-    Pb < myprog.protel | less
+    Pb myprog.P > pretty.P
+    Pb myprog.P pretty.P
+    Pb < myprog.P | less
 
 Shebang makes it directly executable after chmod +x Pb
 """

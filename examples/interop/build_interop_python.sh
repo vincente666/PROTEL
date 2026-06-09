@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 BUILD="$ROOT/build/interop"
-PROTEL="$ROOT/protel"
+PC="$ROOT/Pc"
 RUNTIME="$ROOT/src/runtime/protel_io.c"
 INTEROP="$ROOT/examples/interop"
 
@@ -52,7 +52,7 @@ else
 fi
 
 echo "=== PROTEL calls Python ==="
-"$PROTEL" "$INTEROP/protel_calls_python.protel" \
+"$PC" "$INTEROP/protel_calls_python.P" \
     --keep -o "$BUILD/protel_calls_python.cpp"
 "$CXX" -std=c++20 -Wall -I"$ROOT/src/runtime" -c "$BUILD/protel_calls_python.cpp" \
     -o "$BUILD/protel_calls_python.o"
@@ -64,7 +64,7 @@ echo "=== PROTEL calls Python ==="
 (cd "$ROOT" && "$BUILD/protel_calls_python")
 
 echo "=== Python calls PROTEL ==="
-"$PROTEL" "$INTEROP/protel_for_python.protel" \
+"$PC" "$INTEROP/protel_for_python.P" \
     --keep -o "$BUILD/protel_for_python.cpp"
 "$CXX" -std=c++20 -Wall -fPIC -I"$ROOT/src/runtime" -c "$BUILD/protel_for_python.cpp" \
     -o "$BUILD/protel_for_python.o"

@@ -48,14 +48,14 @@ int main(int argc, char** argv) {
 
 When the ENTRY body does not **RETURNS integer**, the wrapper calls the procedure and returns `0`.
 
-### Example: `examples/intro_5_5_2_args_exit.protel`
+### Example: `examples/intro_5_5_2_args_exit.P`
 
 This module prints each command-line argument (including the program name) and **RETURN**s `argc` as the exit status.
 
 Build and run:
 
 ```bash
-./protel examples/intro_5_5_2_args_exit.protel -o build/ArgsExit --run -- one two
+./Pc examples/intro_5_5_2_args_exit.P -o build/ArgsExit --run -- one two
 echo $?
 ```
 
@@ -77,6 +77,6 @@ Command-line demonstration uses **EXTERNAL** C linkage to the minimal POSIX runt
 
 ### See also
 
-- §7.0 — **PROTEL 2026 Development Tools** (`protel` driver, `--run`)
-- §7.0.5 — **Runnable `.protel` files (shebang)** — direct execution with `#!/usr/bin/env protel-run`
+- §7.0 — **PROTEL 2026 Development Tools** (`Pc` compiler, `--run`)
+- §7.0.5 — **Runnable `.P` files (shebang)** — direct execution with `#!/usr/bin/env Pc!`
 - Reference Manual §13 — **EXPORT** / **EXTERNAL** (ENTRY vs library procedures)

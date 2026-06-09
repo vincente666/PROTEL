@@ -1,0 +1,324 @@
+.\" PROTEL 2026 manual — Vincente D'Ingianni
+.TH Pc 1 "June 2026" "PROTEL 2026" "User Commands"
+.SH NAME
+Pc \- PROTEL 2026 compiler (parser, transpiler, and GCC/clang++ driver)
+.SH SYNOPSIS
+.B Pc
+[\fIoptions\fR]
+.I input
+[\fIinput\fR ...]
+[\fB\-\-\fR \fIprogram\-args\fR ...]
+.PP
+.B Pc!
+.I script.P
+[\fIprogram\-args\fR ...]
+.SH DESCRIPTION
+.B Pc
+is the PROTEL 2026 compiler driver. It parses PROTEL source, performs
+strong type checking, transpiles to C++ (or C with
+.BR \-\-emit\-c ),
+and optionally invokes
+.BR g++ ,
+.BR clang++ ,
+or
+.BR c++
+to produce object files or executables.
+.PP
+On first use,
+.B Pc
+bootstraps a private Python virtual environment
+.RI ( .venv )
+in the PROTEL project tree and installs parser dependencies (Lark).
+.PP
+The default source suffix is
+.BR .P
+(historical Nortel/BNR convention). The compiler does
+.I not
+require any particular extension; recognized suffixes are
+.BR .P ,
+.BR .protel ,
+.BR .pt ,
+.BR .ptl ,
+and PLS edition suffixes
+.B .AA01
+through
+.BR .ZZ99 .
+Unrecognized names still compile when the file contains valid PROTEL source.
+.PP
+PLS edition files (for example
+.IR vdi.aa01 )
+automatically enable classical preprocessing (keyword normalization;
+.B $LI
+and
+.B $EJECT
+linker directives stripped before parse) even without
+.BR \-\-classical .
+.SH OPTIONS
+.TP
+.BR \-o ", " \-\-output " " \fIfile\fR
+Write generated C/C++ source, an object file, or an executable to
+.IR file .
+When
+.I file
+ends in
+.B .c
+or
+.BR .cpp ,
+only source is emitted. Otherwise, an
+.BR \-\-output
+name that does not end in
+.B .c
+or
+.B .cpp
+implies compile/link mode.
+.TP
+.B \-\-classical
+Use legacy PROTEL identifier rules (keywords remain UPPERCASE).
+Automatically enabled for PLS edition suffixes.
+.TP
+.B \-\-parse\-only
+Parse the source and print an abstract-syntax summary to standard error;
+do not transpile or compile.
+.TP
+.B \-\-emit\-c
+Emit C instead of C++ (default output is C++). Compile and link modes
+require C++ output; do not combine
+.B \-\-emit\-c
+with
+.BR \-\-compile ,
+.BR \-\-run ,
+or
+.BR \-c .
+.TP
+.B \-\-compile
+Transpile and compile to a native executable or object file.
+.TP
+.B \-\-run
+Compile and run the program (implies
+.BR \-\-compile ).
+The process exit status is the integer returned by the ENTRY procedure,
+or the shell status of the generated executable.
+.TP
+.BR \-c
+Compile only: produce an object file (passed through to the C++ compiler).
+.TP
+.BR \-g
+Generate debug information (passed through to the C++ compiler).
+.TP
+.B \-\-keep
+Retain the generated
+.B .cpp
+(or
+.BR .c )
+file after compiling. By default, intermediate source in
+.I build/
+is removed once linking succeeds.
+.TP
+.B \-\-version
+Print the
+.B Pc
+version
+.RI ( Pc " 0.3.0" )
+and exit.
+.TP
+.BR \-h ", " \-\-help
+Print usage and exit.
+.SH PROGRAM ARGUMENTS
+When
+.B \-\-run
+is used, arguments intended for the PROTEL ENTRY procedure may follow a
+.B \-\-
+separator:
+.PP
+.RS
+.B Pc
+.I source.P
+.B \-\-run \-\-
+.I arg1 arg2 ...
+.RE
+.PP
+These are forwarded to
+.IR argc / argv
+in the ENTRY procedure (Introductory Manual \(S5.5.2).
+.SH MODES
+.TP
+.B Transpile only (default)
+With no compile flags and no executable
+.BR \-o ,
+generated C++ is written to standard output.
+.TP
+.B Transpile to file
+.B Pc
+.I source.P \-o
+.I out.cpp
+writes generated source only.
+.TP
+.B Compile / link
+.BR \-\-compile ,
+.BR \-\-run ,
+.BR \-c ,
+or
+.B \-o
+naming a non\-source output triggers compilation. Generated C++ is written
+under
+.I build/
+unless
+.B \-o
+names a
+.B .cpp
+path. The minimal I/O runtime
+.RI ( src/runtime/protel_io.c )
+is linked when needed. Default executable name is
+.BR a.out .
+.TP
+.B Multiple inputs
+More than one
+.I input
+file may appear on the command line; only the first is compiled. A warning
+is issued for additional files.
+.SH "SHEBANG RUNNER (Pc!)"
+.B Pc!
+(pronounced
+.I "P c Bang" )
+is a companion helper installed alongside
+.BR Pc .
+The exclamation mark echoes the
+.B \(lq#!\(rq
+.I shebang
+convention and provides a short command\-line alias for running programs.
+.PP
+.B Pc!
+is equivalent to:
+.PP
+.RS
+.B Pc
+.I script.P \-\-run \-\-
+[\fIprogram\-args\fR ...]
+.RE
+.PP
+Typical shebang line in an executable
+.B .P
+file:
+.PP
+.RS
+.B #!/usr/bin/env Pc!
+.RE
+.PP
+Requirements for direct execution:
+.IP \(bu 3
+Line 1 must be a UNIX shebang naming
+.BR Pc! .
+.IP \(bu 3
+The file must be executable
+.RI ( chmod +x ).
+.IP \(bu 3
+The PROTEL project directory must be on
+.BR PATH
+so
+.B Pc!
+and
+.B Pc
+are found.
+.PP
+Examples:
+.PP
+.RS
+.nf
+export PATH="$PWD:$PATH"
+./examples/Hello.P
+Pc! examples/Hello.P
+Pc! examples/intro_5_5_2_args_exit.P one two
+.fi
+.RE
+.PP
+The preprocessor strips the shebang before parse; it is not PROTEL syntax.
+.SH ENVIRONMENT
+.TP
+.B PATH
+Must include the PROTEL project directory (or install prefix) so
+.B Pc
+and
+.B Pc!
+can be located by the shell and by
+.BR "env" .
+Quoted
+.B \(lq~/PROTEL\(rq
+in
+.B PATH
+does not expand; use
+.BR $PWD ,
+.BR $HOME/PROTEL ,
+or an absolute path.
+.SH FILES
+.TP
+.I .venv/
+Project Python virtual environment (created on first run).
+.TP
+.I build/
+Default directory for generated
+.B .cpp
+files during compilation.
+.TP
+.I src/runtime/protel_io.c
+Minimal EXTERNAL I/O runtime linked by default.
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Parse, type, transpile, compile, or I/O error.
+.TP
+.B >0
+When
+.B \-\-run
+is used, the ENTRY procedure return value or program exit status.
+.SH EXAMPLES
+Transpile to standard output:
+.PP
+.RS
+.B Pc examples/Hello.P
+.RE
+.PP
+Compile and run:
+.PP
+.RS
+.B Pc examples/Hello.P \-\-run
+.RE
+.PP
+Named executable and ENTRY arguments:
+.PP
+.RS
+.B Pc examples/intro_5_5_2_args_exit.P \-o build/ArgsExit \-\-run \-\- one two
+.RE
+.PP
+Object file (PLS module):
+.PP
+.RS
+.B Pc vdi.aa01 \-c \-o build/vdi.aa01.o
+.RE
+.PP
+Keep generated C++ for inspection:
+.PP
+.RS
+.B Pc myprog.P \-\-compile \-\-keep \-o build/myprog
+.RE
+.PP
+Classical (legacy) identifiers:
+.PP
+.RS
+.B Pc legacy.P \-\-classical \-\-run
+.RE
+.SH "SEE ALSO"
+.BR Pb (1),
+.BR protel-mode
+(Emacs),
+Introductory Manual \(S7.0,
+\(S7.1,
+\(S7.0.5,
+Reference Manual \(S11.3 (type errors),
+.IR docs/reference-error-messages.md
+.SH AUTHORS
+Vincente D'Ingianni \(em PROTEL 2026 revival project.
+.SH COPYRIGHT
+PROTEL \(co Vincente D'Ingianni / Binary Systems.

@@ -145,7 +145,7 @@ extern "C" {
 
 ## Linking
 
-1. Transpile PROTEL to `.cpp` with the PROTEL 2026 compiler (`protel`).
+1. Transpile PROTEL to `.cpp` with the PROTEL 2026 compiler (`Pc`).
 
 2. Compile generated C++ with `g++` or `clang++` (`-std=c++20`).
 

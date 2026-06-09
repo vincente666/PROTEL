@@ -36,7 +36,7 @@ class TypeInfo:
 
 
 class TypeChecker:
-    def __init__(self, *, source_name: str = "input.protel"):
+    def __init__(self, *, source_name: str = "input.P"):
         self.source_name = source_name
         self.types = TypeContext()
         self._scopes: list[dict[str, TypeInfo]] = [{}]
@@ -333,6 +333,6 @@ class TypeChecker:
 def check_types(
     compilation_unit: list[ast.Section],
     *,
-    source_name: str = "input.protel",
+    source_name: str = "input.P",
 ) -> None:
     TypeChecker(source_name=source_name).check(compilation_unit)

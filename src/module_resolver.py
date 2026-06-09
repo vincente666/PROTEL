@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 from . import ast_nodes as ast
-from .extensions import is_protel_source
+from .extensions import is_protel_source, uses_module_candidates
 from .parser import parse_protel
 from .transpiler import TranspileError
 
@@ -59,9 +59,10 @@ def _find_module_path(
     if module_name in index:
         return index[module_name]
     for base in _search_dirs(source_path):
-        candidate = base / f"{module_name}.protel"
-        if candidate.is_file():
-            return candidate.resolve()
+        for candidate in uses_module_candidates(module_name):
+            path = base / candidate
+            if path.is_file():
+                return path.resolve()
     return None
 
 
@@ -133,7 +134,7 @@ def resolve_compilation_unit(
         path = _find_module_path(module_name, source_path=source_path, index=index)
         if path is None:
             print(
-                f"protel: warning: USES module {module_name!r} not found; "
+                f"Pc: warning: USES module {module_name!r} not found; "
                 f"skipping embed",
                 file=sys.stderr,
             )

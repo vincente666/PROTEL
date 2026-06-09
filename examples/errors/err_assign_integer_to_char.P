@@ -1,5 +1,5 @@
 % ERROR EXAMPLE — integer assigned to char (Reference Manual §11.3)
-% Expected: protel: type error: cannot assign integer to char
+% Expected: Pc: type error: cannot assign integer to char
 
 SECTION err_int_to_char;
 

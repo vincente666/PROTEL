@@ -101,7 +101,7 @@ DCL Start PROC() IS
 ### Step 4 — Build and link
 
 ```bash
-protel myprog.protel --keep -o build/myprog.cpp
+Pc myprog.P --keep -o build/myprog.cpp
 clang++ -std=c++20 -c build/myprog.cpp -o build/myprog.o
 rustc --crate-type staticlib rust_greet.rs -o build/librust_greet.a
 clang++ build/myprog.o build/librust_greet.a src/runtime/protel_io.c -o myprog
@@ -185,7 +185,7 @@ Compile the EXPORT module and a thin **JNI** bridge into `libjavacallsprotel.dyl
 ### Step 4 — Link
 
 ```bash
-protel protel_for_rust.protel --keep -o build/protel_for_rust.cpp
+Pc protel_for_rust.P --keep -o build/protel_for_rust.cpp
 clang++ -std=c++20 -c build/protel_for_rust.cpp -o build/protel_for_rust.o
 rustc rust_calls_protel.rs build/protel_for_rust.o -o rust_calls_protel
 ```
@@ -193,7 +193,7 @@ rustc rust_calls_protel.rs build/protel_for_rust.o -o rust_calls_protel
 **Python** (shared library + ctypes):
 
 ```bash
-protel protel_for_python.protel --keep -o build/protel_for_python.cpp
+Pc protel_for_python.P --keep -o build/protel_for_python.cpp
 clang++ -std=c++20 -fPIC -c build/protel_for_python.cpp -o build/protel_for_python.o
 clang++ -shared -o build/libprotel_for_python.so build/protel_for_python.o
 python3 examples/interop/python_calls_protel.py
@@ -202,7 +202,7 @@ python3 examples/interop/python_calls_protel.py
 **Java** (shared library + JNI):
 
 ```bash
-protel protel_for_java.protel --keep -o build/protel_for_java.cpp
+Pc protel_for_java.P --keep -o build/protel_for_java.cpp
 clang++ -std=c++20 -fPIC -c build/protel_for_java.cpp -o build/protel_for_java.o
 clang -fPIC -c java_calls_protel.c -o build/java_calls_protel.o -I$JAVA_HOME/include
 clang++ -shared -o build/libjavacallsprotel.so build/protel_for_java.o build/java_calls_protel.o
@@ -215,7 +215,7 @@ java -Djava.library.path=build/interop -cp build/interop JavaCallsProtel
 
 ### PROTEL calls Rust
 
-File: `examples/interop/protel_calls_rust.protel`
+File: `examples/interop/protel_calls_rust.P`
 
 ```
 SECTION protel_calls_rust;
@@ -237,7 +237,7 @@ DCL Start PROC() IS
 
 ### PROTEL calls Python
 
-File: `examples/interop/protel_calls_python.protel`
+File: `examples/interop/protel_calls_python.P`
 
 ```
 SECTION protel_calls_python;
@@ -259,7 +259,7 @@ DCL Start PROC() IS
 
 ### Rust calls PROTEL
 
-File: `examples/interop/protel_for_rust.protel` (same EXPORT library as Swift example)
+File: `examples/interop/protel_for_rust.P` (same EXPORT library as Swift example)
 
 ```
 INTERFACE protel_math;
@@ -276,7 +276,7 @@ DCL protel_add PROC(a integer, b integer) RETURNS integer IS
 
 ### PROTEL calls Java
 
-File: `examples/interop/protel_calls_java.protel`
+File: `examples/interop/protel_calls_java.P`
 
 ```
 SECTION protel_calls_java;
@@ -298,11 +298,11 @@ DCL Start PROC() IS
 
 ### Python calls PROTEL
 
-File: `examples/interop/python_calls_protel.py` loads `protel_for_python.protel` as a shared library via **ctypes**.
+File: `examples/interop/python_calls_protel.py` loads `protel_for_python.P` as a shared library via **ctypes**.
 
 ### Java calls PROTEL
 
-File: `examples/interop/JavaCallsProtel.java` loads `protel_for_java.protel` via **JNI** (`java_calls_protel.c` bridge).
+File: `examples/interop/JavaCallsProtel.java` loads `protel_for_java.P` via **JNI** (`java_calls_protel.c` bridge).
 
 ---
 
@@ -320,14 +320,14 @@ A single module may have **one ENTRY** and **many EXPORT** procedures.
 
 | Task | PROTEL | Build driver |
 |------|--------|--------------|
-| Hello World (PROTEL only) | `protel Hello.protel --run` | `protel` + `clang++` |
-| Hello World (direct shebang) | `./examples/Hello.protel` | §7.0.5 — `export PATH="$PWD:$PATH"`, file executable |
+| Hello World (PROTEL only) | `Pc Hello.P --run` | `Pc` + `clang++` |
+| Hello World (direct shebang) | `./examples/Hello.P` | §7.0.5 — `export PATH="$PWD:$PATH"`, file executable |
 | PROTEL + Swift | `make interop-swift` | `examples/interop/build_interop.sh` |
 | PROTEL + Rust | `make interop-rust` | `examples/interop/build_interop_rust.sh` |
 | PROTEL + Python | `make interop-python` | `examples/interop/build_interop_python.sh` |
 | PROTEL + Java | `make interop-java` | `examples/interop/build_interop_java.sh` |
-| Edit `.protel` / `.P` / PLS `.AA01` in Emacs | Add `emacs/` to `load-path`, `(require 'protel-mode)` | See §7.2 |
-| Beautify source | `Pb file.protel` | `Pb` |
+| Edit `.P` / `.P` / PLS `.AA01` in Emacs | Add `emacs/` to `load-path`, `(require 'protel-mode)` | See §7.2 |
+| Beautify source | `Pb file.P` | `Pb` |
 
 ---
 

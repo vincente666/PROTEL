@@ -7,9 +7,9 @@ from src.cpp_transpiler import transpile_to_cpp
 from src.parser import parse_protel
 
 ROOT = Path(__file__).resolve().parent.parent
-EXAMPLE = ROOT / "examples" / "intro_1_3_factorial_cli.protel"
-FACTORIAL = ROOT / "examples" / "intro_1_3_factorial.protel"
-PROTEL = ROOT / "protel"
+EXAMPLE = ROOT / "examples" / "intro_1_3_factorial_cli.P"
+FACTORIAL = ROOT / "examples" / "intro_1_3_factorial.P"
+PROTEL = ROOT / "Pc"
 PYTHON = ROOT / ".venv" / "bin" / "python"
 
 

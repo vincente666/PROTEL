@@ -1,6 +1,8 @@
-% Hello World - legacy .P extension (Introductory Manual 5.5.2 / 7.0 / 7.2)
-% Same program as Hello.protel; .P is the historical Nortel/BNR suffix.
+#!/usr/bin/env Pc!
+% Hello World - PROTEL 2026 (Introductory Manual 5.5.2 / 7.0)
+% Run from repo root: export PATH="$PWD:$PATH" && ./examples/Hello.P
 % EXTERNAL C I/O via minimal runtime; no INTRINSIC, no iostream.
+% PROTEL strings are char tuples; append 0 explicitly for C calls.
 
 SECTION Hello;
 

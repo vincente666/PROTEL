@@ -10,8 +10,8 @@ from src.parser import parse_protel
 from src.transpiler import TranspileError
 
 ROOT = Path(__file__).resolve().parent.parent
-EXAMPLE = ROOT / "examples" / "intro_5_5_2_args_exit.protel"
-PROTEL = ROOT / "protel"
+EXAMPLE = ROOT / "examples" / "intro_5_5_2_args_exit.P"
+PROTEL = ROOT / "Pc"
 PYTHON = ROOT / ".venv" / "bin" / "python"
 
 

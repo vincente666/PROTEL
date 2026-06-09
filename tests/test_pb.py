@@ -34,9 +34,9 @@ def test_dollar_li_line_with_leading_whitespace():
 
 def test_pb_preserves_shebang_first_line():
     pb = _load_pb()
-    source = "#!/usr/bin/env protel-run\nsection s;\nDCL x BOOL;\n"
+    source = "#!/usr/bin/env Pc!\nsection s;\nDCL x BOOL;\n"
     result = pb.beautify_protel(source)
-    assert result.startswith("#!/usr/bin/env protel-run\n")
+    assert result.startswith("#!/usr/bin/env Pc!\n")
     assert "SECTION" in result
     assert "DCL" in result
 

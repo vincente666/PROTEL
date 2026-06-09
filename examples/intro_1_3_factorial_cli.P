@@ -1,5 +1,6 @@
+#!/usr/bin/env Pc!
 % Introductory Manual §1.3 + §5.5.2 + §7.3
-% Command-line factorial via USES intro_1_3_factorial.protel (section factorial_demo).
+% Command-line factorial via USES intro_1_3_factorial.P (section factorial_demo).
 % Demonstrates C interop: printf() and atoi() are EXTERNAL; no INTRINSIC I/O.
 
 SECTION factorial_cli USES factorial_demo;

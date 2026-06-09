@@ -42,7 +42,7 @@ def _sanitize_namespace(name: str) -> str:
 
 
 class CppTranspiler(CTranspiler):
-    def __init__(self, *, classical: bool = False, source_name: str = "input.protel"):
+    def __init__(self, *, classical: bool = False, source_name: str = "input.P"):
         super().__init__(classical=classical, source_name=source_name)
         self._cpp = True
         self._current_namespace: str | None = None
@@ -724,7 +724,7 @@ def transpile_to_cpp(
     compilation_unit,
     *,
     classical: bool = False,
-    source_name: str = "input.protel",
+    source_name: str = "input.P",
     source_path: Path | None = None,
 ) -> str:
     from .module_resolver import resolve_compilation_unit
@@ -747,7 +747,7 @@ def transpile_file_cpp(
     source: str,
     *,
     classical: bool = False,
-    source_name: str = "input.protel",
+    source_name: str = "input.P",
 ) -> str:
     from .parser import parse_protel
 

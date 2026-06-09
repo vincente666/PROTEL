@@ -36,7 +36,7 @@ class TypeContext:
 
 
 class CTranspiler:
-    def __init__(self, *, classical: bool = False, source_name: str = "input.protel"):
+    def __init__(self, *, classical: bool = False, source_name: str = "input.P"):
         self.classical = classical
         self.source_name = source_name
         self.types = TypeContext()
@@ -747,13 +747,13 @@ class CTranspiler:
 
         if protel_str is not None:
             msg = (
-                f"protel: warning: call to {proc_name} uses a PROTEL string without "
+                f"Pc: warning: call to {proc_name} uses a PROTEL string without "
                 f"an explicit NUL (0) suffix; append ', 0' in a char tuple for C "
                 f"interoperability"
             )
         else:
             msg = (
-                f"protel: warning: call to {proc_name} uses a char tuple without "
+                f"Pc: warning: call to {proc_name} uses a char tuple without "
                 f"a trailing 0 byte for C interoperability"
             )
         print(msg, file=sys.stderr)
@@ -796,7 +796,7 @@ def transpile_to_c(
     compilation_unit,
     *,
     classical: bool = False,
-    source_name: str = "input.protel",
+    source_name: str = "input.P",
     source_path: "Path | None" = None,
 ) -> str:
     from pathlib import Path
@@ -815,7 +815,7 @@ def transpile_to_c(
     return CTranspiler(classical=classical, source_name=source_name).transpile(compilation_unit)
 
 
-def transpile_file(source: str, *, classical: bool = False, source_name: str = "input.protel") -> str:
+def transpile_file(source: str, *, classical: bool = False, source_name: str = "input.P") -> str:
     from .parser import parse_protel
 
     tree = parse_protel(source, classical=classical)

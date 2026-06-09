@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 BUILD="$ROOT/build/interop"
-PROTEL="$ROOT/protel"
+PC="$ROOT/Pc"
 RUNTIME="$ROOT/src/runtime/protel_io.c"
 
 mkdir -p "$BUILD"
@@ -17,7 +17,7 @@ fi
 CXX="$(command -v clang++ || command -v g++)"
 
 echo "=== PROTEL calls Swift ==="
-"$PROTEL" "$ROOT/examples/interop/protel_calls_swift.protel" \
+"$PC" "$ROOT/examples/interop/protel_calls_swift.P" \
     --keep -o "$BUILD/protel_calls_swift.cpp"
 "$CXX" -std=c++20 -Wall -I"$ROOT/src/runtime" -c "$BUILD/protel_calls_swift.cpp" \
     -o "$BUILD/protel_calls_swift.o"
@@ -28,7 +28,7 @@ swiftc -parse-as-library -c "$ROOT/examples/interop/swift_greet.swift" \
 "$BUILD/protel_calls_swift"
 
 echo "=== Swift calls PROTEL ==="
-"$PROTEL" "$ROOT/examples/interop/protel_for_swift.protel" \
+"$PC" "$ROOT/examples/interop/protel_for_swift.P" \
     --keep -o "$BUILD/protel_for_swift.cpp"
 "$CXX" -std=c++20 -Wall -I"$ROOT/src/runtime" -c "$BUILD/protel_for_swift.cpp" \
     -o "$BUILD/protel_for_swift.o"

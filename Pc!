@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+"""Run a PROTEL source file invoked via shebang (Introductory Manual §7.0.5).
+
+Pc! — pronounced "P c Bang" — is the shebang helper and command-line shortcut
+for running .P programs. The kernel executes: Pc! /path/to/script.P [args]
+"""
+
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parent
+_PC = _ROOT / "Pc"
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        print(
+            "Pc!: missing PROTEL source path "
+            "(use #!/usr/bin/env Pc! in a .P file)",
+            file=sys.stderr,
+        )
+        return 2
+
+    source = Path(sys.argv[1]).resolve()
+    program_args = sys.argv[2:]
+
+    if not _PC.is_file():
+        print(f"Pc!: cannot find Pc driver at '{_PC}'", file=sys.stderr)
+        return 1
+
+    argv = [str(_PC), str(source), "--run", "--", *program_args]
+    os.execv(str(_PC), argv)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
