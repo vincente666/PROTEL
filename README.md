@@ -50,7 +50,7 @@ Over decades, Nortel teams produced **tens of millions of lines** of PROTEL for 
 | Tool | Role |
 |------|------|
 | **`Pc`** | PROTEL compiler — parse, type-check, transpile, and drive GCC/clang++ |
-| **`Pb`** | Beautifier — uppercase reserved keywords |
+| **`Pb`** | PROTEL Beautifier — uppercase and bold reserved keywords |
 | **`Pc!`** | Shebang runner (*"P c Bang"*) — run `.P` files from `#!` lines or the shell |
 | **`protel-mode`** | GNU Emacs major mode for `.P` and related suffixes |
 
