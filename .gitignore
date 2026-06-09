@@ -6,6 +6,7 @@ build/
 a.out
 *.o
 legacy/
+*.pages
 *~
 .*~
 #*#
