@@ -2,7 +2,7 @@
 
 **Procedure Oriented Type Enforcing Language** — a modern reincarnation of the language developed at Nortel/BNR for telecom switching systems, now with a GCC/clang++ toolchain for MacOS and UNIX/Linux.
 
-Author: **Vincente D'Ingianni** — [PROTEL Introductory Manual 2026](PROTEL%20Introductory%20Manual%202026.pdf) and [PROTEL Reference Manual 2026](PROTEL%20Reference%20Manual%202026.pdf)
+Author: **Vincente D'Ingianni** — [PROTEL Introductory Manual 2026](PROTEL%20Introductory%20Manual%202026.pdf), [PROTEL Reference Manual 2026](PROTEL%20Reference%20Manual%202026.pdf), Pc, Pc!, and Pb.
 
 ---
 
@@ -27,7 +27,7 @@ The language was described publicly in a landmark **1979 IEEE paper**:
 
 That paper presented PROTEL as a **telephony systems language** for the DMS program — an Algol/Pascal descendant with left-to-right assignment (`->`, colloquially *gazinta*) and no C-style operator precedence. The authors emphasized strict typing to catch errors during compilation rather than in the field, rich data structuring (numeric subranges, `TABLE`, `SET`, `STRUCT`, pointers, and **descriptors** for bounds-checked array slices), and language features suited to switching software. Their examples included telephony-oriented types such as ranged digit values, digit registers, status conditions, and protocol state — the paper's sample declarations read like call-processing data, not generic systems code.
 
-A striking design choice documented there: for DMS-100, **PROTEL was to be the only implementation language** — no assembly-language escape hatch. The language, **SOS**, the **CALLP** call-processing environment, and the **PLS** (Protel Library System) toolchain formed one integrated platform: compiler, linker, source configuration management, and dynamically loadable modules in a shared address space — with the support software itself written in PROTEL.
+A striking design choice documented there: for DMS-100, **PROTEL was to be the only implementation language** — no assembly-language escape hatch. The language, **SOS**, the **CALLP** call-processing environment, and the **PLS** (Product Library System) toolchain formed one integrated platform: compiler, linker, source configuration management, and dynamically loadable modules in a shared address space — with the support software itself written in PROTEL.
 
 A follow-on paper, [*Experience With a Modular Typed Language: Protel*](https://dl.acm.org/doi/10.5555/800078.802525) (Cashin, Joliat, Kamel, and Lasker, **ICSE 1981**), documented modular interfaces, edition/version control, and the practical benefits of catching inter-module errors at compile time. **PROTEL-2** later added object-oriented extensions used in field features such as Carrier AIN.
 
